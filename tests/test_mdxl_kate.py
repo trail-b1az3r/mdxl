@@ -24,6 +24,12 @@ class KateAndMimeTests(unittest.TestCase):
         ]
         self.assertTrue(includes, "MDXL should reuse Kate's built-in Markdown grammar")
         self.assertEqual(includes[0].get("includeAttrib"), "true")
+        attribute_rule = next(
+            rule for rule in root.findall(".//RegExpr")
+            if rule.get("attribute") == "HeadingAttributes"
+        )
+        self.assertIn(r"\\.[A-Za-z0-9_-]+", attribute_rule.get("String", ""))
+        self.assertIn("&quot;", attribute_rule.get("String", ""))
 
         attributes = {
             element.get("attribute")
