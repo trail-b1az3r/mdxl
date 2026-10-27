@@ -39,6 +39,165 @@ def _flip(match):
     return "\n".join(line.translate(UPSIDE_DOWN)[::-1] for line in reversed(lines))
 
 
+ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+TABLE_SEPARATOR_RE = re.compile(r"^:?-{3,}:?$")
+ALERT_COLORS = {
+    "NOTE": "\033[1;36m",
+    "TIP": "\033[1;32m",
+    "IMPORTANT": "\033[1;35m",
+    "WARNING": "\033[1;33m",
+    "CAUTION": "\033[1;31m",
+}
+
+
+def _visible_length(value):
+    """Return a terminal string's length without counting ANSI control codes."""
+    return len(ANSI_ESCAPE_RE.sub("", value))
+
+
+def _split_table_row(line):
+    """Split a Markdown table row while respecting escaped and code-span pipes."""
+    source = line.strip()
+    if source.startswith("|"):
+        source = source[1:]
+    if source.endswith("|") and not source.endswith(r"\|"):
+        source = source[:-1]
+
+    cells = []
+    current = []
+    in_code = False
+    index = 0
+    while index < len(source):
+        char = source[index]
+        if char == "\\" and index + 1 < len(source) and source[index + 1] == "|":
+            current.append("|")
+            index += 2
+            continue
+        if char == "\x60":
+            in_code = not in_code
+            current.append(char)
+        elif char == "|" and not in_code:
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+        index += 1
+    cells.append("".join(current).strip())
+    return cells
+
+
+def _render_gfm_tables(content):
+    """Render simple GFM tables as aligned, bordered terminal text."""
+    lines = content.splitlines()
+    output = []
+    index = 0
+    trailing_newline = content.endswith(("\n", "\r"))
+
+    while index < len(lines):
+        if index + 1 >= len(lines) or "|" not in lines[index] or "|" not in lines[index + 1]:
+            output.append(lines[index])
+            index += 1
+            continue
+
+        headers = _split_table_row(lines[index])
+        separators = _split_table_row(lines[index + 1])
+        if (
+            len(headers) < 2
+            or len(headers) != len(separators)
+            or not all(TABLE_SEPARATOR_RE.fullmatch(cell) for cell in separators)
+        ):
+            output.append(lines[index])
+            index += 1
+            continue
+
+        alignments = []
+        for cell in separators:
+            if cell.startswith(":") and cell.endswith(":"):
+                alignments.append("center")
+            elif cell.endswith(":"):
+                alignments.append("right")
+            else:
+                alignments.append("left")
+
+        rows = []
+        cursor = index + 2
+        while cursor < len(lines) and "|" in lines[cursor]:
+            row = _split_table_row(lines[cursor])
+            if len(row) != len(headers):
+                break
+            rows.append(row)
+            cursor += 1
+
+        all_rows = [headers, *rows]
+        widths = [
+            max(_visible_length(row[column]) for row in all_rows)
+            for column in range(len(headers))
+        ]
+
+        def border(fill):
+            return "+" + "+".join(fill * (width + 2) for width in widths) + "+"
+
+        def render_row(row):
+            cells = []
+            for column, cell in enumerate(row):
+                padding = max(0, widths[column] - _visible_length(cell))
+                alignment = alignments[column]
+                if alignment == "right":
+                    cell = (" " * padding) + cell
+                elif alignment == "center":
+                    left = padding // 2
+                    cell = (" " * left) + cell + (" " * (padding - left))
+                else:
+                    cell = cell + (" " * padding)
+                cells.append(" " + cell + " ")
+            return "|" + "|".join(cells) + "|"
+
+        output.append(border("-"))
+        output.append(render_row(headers))
+        output.append(border("="))
+        output.extend(render_row(row) for row in rows)
+        output.append(border("-"))
+        index = cursor
+
+    rendered = "\n".join(output)
+    return rendered + ("\n" if trailing_newline else "")
+
+
+def _render_gfm_alerts(content):
+    """Turn GFM alert blockquotes into compact, color-labeled terminal callouts."""
+    lines = content.splitlines()
+    output = []
+    index = 0
+    trailing_newline = content.endswith(("\n", "\r"))
+    alert_pattern = re.compile(r"^>[ \t]*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*$", re.IGNORECASE)
+
+    while index < len(lines):
+        match = alert_pattern.match(lines[index])
+        if not match:
+            output.append(lines[index])
+            index += 1
+            continue
+
+        kind = match.group(1).upper()
+        index += 1
+        body = []
+        while index < len(lines) and re.match(r"^>[ \t]?", lines[index]):
+            body.append(re.sub(r"^>[ \t]?", "", lines[index], count=1))
+            index += 1
+
+        color = ALERT_COLORS[kind]
+        label = f"{color}{kind}:{RESET}"
+        if body:
+            rendered_body = [label + " " + body[0]]
+            rendered_body.extend("    " + line for line in body[1:])
+            output.extend(rendered_body)
+        else:
+            output.append(label)
+
+    rendered = "\n".join(output)
+    return rendered + ("\n" if trailing_newline else "")
+
+
 def render_terminal(content):
     """Render supported MDXL tokens in a plain-text document."""
     fenced = []
@@ -96,6 +255,8 @@ def render_terminal(content):
     content = re.sub(r"^-#\s(.*)$", rf"\033[1;4m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^####\s(.*)$", rf"\033[1;96m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^(#{1,6})\s(.*)$", rf"\033[1;97m\2{RESET}", content, flags=re.MULTILINE)
+    content = _render_gfm_alerts(content)
+    content = _render_gfm_tables(content)
     for index, block in enumerate(mdxl_code_blocks):
         content = content.replace(f"MDXLTERMINALMDXLBLOCK{index}TOKEN", f"\033[33m{block}{RESET}")
     for index, block in enumerate(fenced):
