@@ -42,6 +42,12 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertNotIn("| :--- | ---: |", rendered)
         self.assertIn("\033[9mOld approach\033[0m", rendered)
 
+    def test_flip_uses_terminal_friendly_digit_mappings(self):
+        rendered = render_terminal("/!!!/Hello MDXL 42 7/!!!/")
+        for unsupported in ("\\u1105", "\\u3134", "\\u02e5", "\\u3105"):
+            self.assertNotIn(unsupported, rendered)
+        self.assertIn("ollǝH", rendered)
+
     def test_gfm_alerts_render_as_labeled_callouts(self):
         source = "> [!TIP]\n> Use callouts for a tip.\n> Keep the second line."
         rendered = render_terminal(source)
