@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="text/x-mdxl">
+    <comment>Markdown Extended Logic document</comment>
+    <comment xml:lang="en">Markdown Extended Logic document</comment>
+    <sub-class-of type="text/markdown"/>
+    <glob pattern="*.mdxl" weight="80"/>
+  </mime-type>
+</mime-info>

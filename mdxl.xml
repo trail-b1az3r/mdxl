@@ -1,107 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Markdown XL" version="5" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" author="trail-b1az3r" license="MIT">
+<language name="Markdown Extended Logic" version="6" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" priority="100" author="trail-b1az3r" license="MIT">
   <highlighting>
     <contexts>
-      <context attribute="Normal Text" lineBeginContext="#stay" lineEndContext="#stay" name="Normal Text">
-        <RegExpr attribute="MicroHeader1" context="#stay" String="^-#\s.*$" column="0"/>
-        <RegExpr attribute="MicroHeader2" context="#stay" String="^-##\s.*$" column="0"/>
-        <RegExpr attribute="MicroHeader3" context="#stay" String="^-###\s.*$" column="0"/>
-        <RegExpr attribute="SubHeader" context="#stay" String="^####\s.*$" column="0"/>
-        <RegExpr attribute="Header" context="#stay" String="^#{1,6}\s.*$" column="0"/>
-        <RegExpr attribute="AlertMarker" context="#stay" String="^&gt;\s+\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\].*$" column="0"/>
-        <RegExpr attribute="TaskList" context="#stay" String="^\s*([-+*]|\d+[.)])\s+\[[ xX]\].*$" column="0"/>
-        <RegExpr attribute="FootnoteDefinition" context="#stay" String="^\[\^[^]]+\]:.*$" column="0"/>
-        <RegExpr attribute="Abbreviation" context="#stay" String="^\*\[[^]]+\]:.*$" column="0"/>
-        <RegExpr attribute="Details" context="#stay" String="^\?\?\?\+?\s+.*$" column="0"/>
-        <RegExpr attribute="DefinitionList" context="#stay" String="^:\s+.*$" column="0"/>
-        <RegExpr attribute="TableDelimiter" context="#stay" String="^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$" column="0"/>
-        <RegExpr attribute="HeadingAttributes" context="#stay" String="\{#[A-Za-z0-9_-]+(?:\s+\.?[A-Za-z0-9_-]+)*\}"/>
-        <RegExpr attribute="Footnote" context="#stay" String="\[\^[^]]+\]"/>
-        <RegExpr attribute="Inserted" context="#stay" String="\^\^[^^]+\^\^"/>
-        <RegExpr attribute="Superscript" context="#stay" String="\^[^^]+\^"/>
-        <RegExpr attribute="Mark" context="#stay" String="==[^=]+=="/>
-        <RegExpr attribute="Strikethrough" context="#stay" String="~~[^~]+~~"/>
-        <RegExpr attribute="AutoLink" context="#stay" String="https?://[^\s&lt;&gt;]+"/>
-        <RegExpr attribute="CodeBlock" context="CodeBlock" String="^`{5}.*$" beginRegion="Code"/>
-        <Detect2Chars attribute="Bold" context="Bold" char="*" char1="*"/>
-        <DetectChar attribute="Italic" context="Italic" char="*"/>
-        <DetectChar attribute="CodeInline" context="CodeInline" char="`"/>
+      <!-- MDXL rules run before the bundled Markdown rules. The latter provide
+           standard Markdown syntax and language-aware fenced code highlighting. -->
+      <context name="Normal Text" attribute="Normal Text" lineBeginContext="#stay" lineEndContext="#stay">
+        <!-- Five or more backticks are MDXL copyable-code fences. -->
+        <RegExpr attribute="CodeBlockFence" context="MDXL Code Block" String="^\x60{5,}.*$" column="0" beginRegion="mdxl-code"/>
+
+        <!-- MDXL micro-headings; keep their text in a heading context so inline
+             Markdown and MDXL formatting can still be highlighted. -->
+        <RegExpr attribute="MicroHeader3" context="MicroHeader3 Line" String="^-###\s+" column="0"/>
+        <RegExpr attribute="MicroHeader2" context="MicroHeader2 Line" String="^-##\s+" column="0"/>
+        <RegExpr attribute="MicroHeader1" context="MicroHeader1 Line" String="^-#\s+" column="0"/>
+
+        <!-- Extended Markdown block markers. Style only the marker when possible
+             so inline formatting in the rest of the line remains available. -->
+        <RegExpr attribute="AlertMarker" String="^&gt;[ \t]*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]" column="0" insensitive="true"/>
+        <RegExpr attribute="TaskList" String="^\s*(?:[-+*]|\d+[.)])\s+\[[ xX]\](?=\s)" column="0"/>
+        <RegExpr attribute="FootnoteDefinition" String="^\[\^[^]]+\]:" column="0"/>
+        <RegExpr attribute="Abbreviation" String="^\*\[[^]]+\]:" column="0"/>
+        <RegExpr attribute="Details" String="^\s*\?\?\?\+?\s+.*$" column="0"/>
+        <RegExpr attribute="DefinitionList" String="^\s*:\s+" column="0"/>
+        <RegExpr attribute="TableDelimiter" String="^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$" column="0"/>
+
+        <!-- Extended inline syntax. -->
+        <RegExpr attribute="HeadingAttributes" String="\{(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?)(?:\s+(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?))*\}"/>
+        <RegExpr attribute="Footnote" String="\[\^[^]]+\]"/>
+        <RegExpr attribute="Inserted" String="\^\^[^^]+\^\^" minimal="true"/>
+        <RegExpr attribute="Superscript" String="\^[^^]+\^" minimal="true"/>
+        <RegExpr attribute="Mark" String="==[^=]+==" minimal="true"/>
+        <RegExpr attribute="Strikethrough" String="~~[^~]+~~" minimal="true"/>
+        <RegExpr attribute="AutoLink" String="(?:https?|ftp)://[^\s&lt;&gt;\x60]+"/>
+        <RegExpr attribute="Emoji" String=":([A-Za-z0-9_+-]+):"/>
+
+        <!-- MDXL-only text effects and symbols. -->
         <StringDetect attribute="Special" context="UpsideDown" String="/!!!/"/>
-        <StringDetect attribute="Blockquote" context="#stay" String="&gt;&gt;"/>
-        <StringDetect attribute="Arrow" context="#stay" String="[[==&gt;&gt;]]"/>
-        <StringDetect attribute="Arrow" context="#stay" String="[[&lt;&lt;==]]"/>
-        <StringDetect attribute="Arrow" context="#stay" String="[[&lt;=&gt;&gt;]]"/>
-        <RegExpr attribute="InvisibleInk" context="#stay" String="\|\|\|\|\[.*?\]\|\|\|\|"/>
+        <StringDetect attribute="Blockquote" String="&gt;&gt;"/>
+        <StringDetect attribute="Arrow" String="[[==&gt;&gt;]]"/>
+        <StringDetect attribute="Arrow" String="[[&lt;&lt;==]]"/>
+        <StringDetect attribute="Arrow" String="[[&lt;=&gt;&gt;]]"/>
+        <RegExpr attribute="InvisibleInk" String="\|\|\|\|\[.*?\]\|\|\|\|" minimal="true"/>
         <StringDetect attribute="ColorTag" context="ColorText" String="/col//"/>
         <StringDetect attribute="HighlightTag" context="HlText" String="//hl//"/>
         <StringDetect attribute="RedactTag" context="RedText" String="/red//"/>
         <StringDetect attribute="RainbowTag" context="RbwText" String="/rbw//"/>
         <StringDetect attribute="KeyTag" context="KeyText" String="//key//"/>
-        <RegExpr attribute="ProgressBar" context="#stay" String="/bar//[0-9]{1,3}//"/>
-        <RegExpr attribute="Emoji" context="#stay" String=":[a-z0-9_]+:"/>
+        <RegExpr attribute="ProgressBar" String="/bar//[0-9]{1,3}//"/>
+
+        <!-- Bundled Kate Markdown grammar: headings, lists, emphasis, links/images,
+             tables, blockquotes, horizontal rules, code fences and code languages. -->
+        <IncludeRules context="Normal Text##Markdown" includeAttrib="true"/>
       </context>
-      <context attribute="Bold" lineBeginContext="#stay" lineEndContext="#stay" name="Bold"><Detect2Chars attribute="Bold" context="#pop" char="*" char1="*"/></context>
-      <context attribute="Italic" lineBeginContext="#stay" lineEndContext="#stay" name="Italic"><DetectChar attribute="Italic" context="#pop" char="*"/></context>
-      <context attribute="CodeInline" lineBeginContext="#stay" lineEndContext="#stay" name="CodeInline"><DetectChar attribute="CodeInline" context="#pop" char="`"/></context>
-      <context attribute="CodeBlock" lineBeginContext="#stay" lineEndContext="#stay" name="CodeBlock"><RegExpr attribute="CodeBlock" context="#pop" String="^`{5,}$" endRegion="Code"/></context>
-      <context attribute="UpsideDown" lineBeginContext="#stay" lineEndContext="#stay" name="UpsideDown"><StringDetect attribute="Special" context="#pop" String="/!!!/"/></context>
-      <context attribute="ColorText" lineBeginContext="#stay" lineEndContext="#stay" name="ColorText"><RegExpr attribute="ColorTag" context="#pop" String="/col#[0-9a-fA-F]{6}//"/></context>
-      <context attribute="HlText" lineBeginContext="#stay" lineEndContext="#stay" name="HlText"><StringDetect attribute="HighlightTag" context="#pop" String="//hl//"/></context>
-      <context attribute="RedText" lineBeginContext="#stay" lineEndContext="#stay" name="RedText"><StringDetect attribute="RedactTag" context="#pop" String="/red//"/></context>
-      <context attribute="RbwText" lineBeginContext="#stay" lineEndContext="#stay" name="RbwText"><StringDetect attribute="RainbowTag" context="#pop" String="/rbw//"/></context>
-      <context attribute="KeyText" lineBeginContext="#stay" lineEndContext="#stay" name="KeyText"><StringDetect attribute="KeyTag" context="#pop" String="//key//"/></context>
+
+      <context name="MicroHeader1 Line" attribute="MicroHeader1" lineEndContext="#pop">
+        <IncludeRules context="Normal Text"/>
+      </context>
+      <context name="MicroHeader2 Line" attribute="MicroHeader2" lineEndContext="#pop">
+        <IncludeRules context="Normal Text"/>
+      </context>
+      <context name="MicroHeader3 Line" attribute="MicroHeader3" lineEndContext="#pop">
+        <IncludeRules context="Normal Text"/>
+      </context>
+
+      <context name="MDXL Code Block" attribute="MDXL Code Block" lineBeginContext="#stay" lineEndContext="#stay">
+        <RegExpr attribute="CodeBlockFence" context="#pop" String="^\x60{5,}\s*$" column="0" endRegion="mdxl-code"/>
+      </context>
+      <context name="UpsideDown" attribute="UpsideDown" lineBeginContext="#stay" lineEndContext="#stay">
+        <StringDetect attribute="Special" context="#pop" String="/!!!/"/>
+      </context>
+      <context name="ColorText" attribute="ColorText" lineBeginContext="#stay" lineEndContext="#stay">
+        <RegExpr attribute="ColorTag" context="#pop" String="/col:?[0-9a-fA-F]{6}//"/>
+      </context>
+      <context name="HlText" attribute="HlText" lineBeginContext="#stay" lineEndContext="#stay">
+        <StringDetect attribute="HighlightTag" context="#pop" String="//hl//"/>
+      </context>
+      <context name="RedText" attribute="RedText" lineBeginContext="#stay" lineEndContext="#stay">
+        <StringDetect attribute="RedactTag" context="#pop" String="/red//"/>
+      </context>
+      <context name="RbwText" attribute="RbwText" lineBeginContext="#stay" lineEndContext="#stay">
+        <StringDetect attribute="RainbowTag" context="#pop" String="/rbw//"/>
+      </context>
+      <context name="KeyText" attribute="KeyText" lineBeginContext="#stay" lineEndContext="#stay">
+        <StringDetect attribute="KeyTag" context="#pop" String="//key//"/>
+      </context>
     </contexts>
+
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
-      <itemData name="Header" defStyleNum="dsFunction" bold="1"/>
-      <itemData name="TaskList" defStyleNum="dsDataType" bold="1" color="#8bd86b"/>
-      <itemData name="Strikethrough" defStyleNum="dsNormal" strikeOut="1" color="#969f8f"/>
-      <itemData name="Mark" defStyleNum="dsNormal" backgroundColor="#d7fb81" color="#17210e" bold="1"/>
-      <itemData name="Superscript" defStyleNum="dsDecVal" color="#88d1ff"/>
-      <itemData name="Inserted" defStyleNum="dsNormal" underline="1" color="#c0f477"/>
-      <itemData name="Footnote" defStyleNum="dsDecVal" color="#b8a2ff"/>
+      <itemData name="MicroHeader1" defStyleNum="dsFunction" bold="1" color="#e0a0ff"/>
+      <itemData name="MicroHeader2" defStyleNum="dsFunction" bold="1" color="#8bd5ff"/>
+      <itemData name="MicroHeader3" defStyleNum="dsFunction" bold="1" color="#9ee37d"/>
+      <itemData name="CodeBlockFence" defStyleNum="dsKeyword" bold="1" color="#d7a7ff"/>
+      <itemData name="MDXL Code Block" defStyleNum="dsString" color="#c5b5a8"/>
+      <itemData name="AlertMarker" defStyleNum="dsKeyword" color="#ffb86b" bold="1"/>
+      <itemData name="TaskList" defStyleNum="dsDataType" color="#8bd86b" bold="1"/>
       <itemData name="FootnoteDefinition" defStyleNum="dsComment" color="#b8a2ff"/>
       <itemData name="Abbreviation" defStyleNum="dsKeyword" color="#88d1ff"/>
       <itemData name="Details" defStyleNum="dsKeyword" color="#c0f477" bold="1"/>
       <itemData name="DefinitionList" defStyleNum="dsComment" italic="1"/>
       <itemData name="TableDelimiter" defStyleNum="dsComment" color="#829078"/>
       <itemData name="HeadingAttributes" defStyleNum="dsAnnotation" color="#b8a2ff"/>
-      <itemData name="AlertMarker" defStyleNum="dsKeyword" color="#ffb86b" bold="1"/>
+      <itemData name="Footnote" defStyleNum="dsDecVal" color="#b8a2ff"/>
+      <itemData name="Strikethrough" defStyleNum="dsNormal" strikeOut="1" color="#969f8f"/>
+      <itemData name="Mark" defStyleNum="dsNormal" backgroundColor="#d7fb81" color="#17210e" bold="1"/>
+      <itemData name="Superscript" defStyleNum="dsDecVal" color="#88d1ff"/>
+      <itemData name="Inserted" defStyleNum="dsNormal" underline="1" color="#c0f477"/>
       <itemData name="AutoLink" defStyleNum="dsString" color="#88d1ff" underline="1"/>
-      <itemData name="MicroHeader1" defStyleNum="dsDataType" bold="1" color="#555555"/>
-      <itemData name="MicroHeader2" defStyleNum="dsDataType" bold="1" color="#777777"/>
-      <itemData name="MicroHeader3" defStyleNum="dsDataType" bold="1" color="#999999"/>
-      <itemData name="SubHeader" defStyleNum="dsDataType" bold="1" color="#9bdc7a"/>
-      <itemData name="Bold" defStyleNum="dsNormal" bold="1"/>
-      <itemData name="Italic" defStyleNum="dsNormal" italic="1"/>
-      <itemData name="CodeInline" defStyleNum="dsConstant" color="#d14"/>
-      <itemData name="CodeBlock" defStyleNum="dsString"/>
-      <itemData name="Special" defStyleNum="dsKeyword" color="#e36209"/>
+      <itemData name="Emoji" defStyleNum="dsChar" color="#b45309"/>
+      <itemData name="Special" defStyleNum="dsKeyword" color="#e36209" bold="1"/>
+      <itemData name="UpsideDown" defStyleNum="dsNormal" color="#d7c5ef"/>
       <itemData name="Blockquote" defStyleNum="dsComment" italic="1"/>
       <itemData name="Arrow" defStyleNum="dsDataType" bold="1" color="#007bff"/>
       <itemData name="InvisibleInk" defStyleNum="dsNormal" color="#333333" backgroundColor="#333333"/>
-      <itemData name="ColorTag" defStyleNum="dsKeyword" color="#ff0000" bold="1"/>
-      <itemData name="ColorText" defStyleNum="dsNormal" color="#ff00ff"/>
+      <itemData name="ColorTag" defStyleNum="dsKeyword" color="#ff4040" bold="1"/>
+      <itemData name="ColorText" defStyleNum="dsNormal" color="#ff55dd"/>
       <itemData name="HighlightTag" defStyleNum="dsKeyword" color="#b58900"/>
       <itemData name="HlText" defStyleNum="dsNormal" backgroundColor="#fff3a0" color="#333333"/>
-      <itemData name="RedactTag" defStyleNum="dsKeyword" color="#888888"/>
-      <itemData name="RedText" defStyleNum="dsNormal" strikeOut="1" color="#888888"/>
-      <itemData name="RainbowTag" defStyleNum="dsKeyword" color="#ff00ff"/>
-      <itemData name="RbwText" defStyleNum="dsNormal" bold="1" color="#ff00ff"/>
-      <itemData name="KeyTag" defStyleNum="dsKeyword" color="#444444"/>
-      <itemData name="KeyText" defStyleNum="dsNormal" backgroundColor="#dddddd" bold="1"/>
-      <itemData name="ProgressBar" defStyleNum="dsDataType" bold="1" color="#2e7d32"/>
-      <itemData name="Emoji" defStyleNum="dsChar" color="#b45309"/>
+      <itemData name="RedactTag" defStyleNum="dsKeyword" color="#ff5555"/>
+      <itemData name="RedText" defStyleNum="dsNormal" strikeOut="1" color="#ff5555"/>
+      <itemData name="RainbowTag" defStyleNum="dsKeyword" color="#ff55dd"/>
+      <itemData name="RbwText" defStyleNum="dsNormal" bold="1" color="#ff55dd"/>
+      <itemData name="KeyTag" defStyleNum="dsKeyword" color="#d7d7d7"/>
+      <itemData name="KeyText" defStyleNum="dsNormal" backgroundColor="#dddddd" color="#222222" bold="1"/>
+      <itemData name="ProgressBar" defStyleNum="dsDataType" bold="1" color="#9ee37d"/>
     </itemDatas>
+
     <completion>
-      <item>-# </item><item>-## </item><item>-### </item><item>#### </item>
-      <item>- [ ] </item><item>- [x] </item><item>[^note]: </item><item>*[HTML]: </item>
-      <item>&gt; [!NOTE]</item><item>&gt; [!TIP]</item><item>&gt; [!WARNING]</item>
-      <item>## Heading {#id}</item><item>??? note "Details"</item><item>==highlight==</item><item>~~strikethrough~~</item>
-      <item>| Header | Header |</item><item>| --- | ---: |</item>
-      <item>`````python</item><item>`````bash</item>
-      <item>/!!!/</item><item>/col//</item><item>/col#</item><item>||||[</item><item>]||||</item>
+      <item>-# </item><item>-## </item><item>-### </item>
+      <item># Heading</item><item>## Heading</item><item>### Heading</item><item>#### Heading</item>
+      <item>- [ ] </item><item>- [x] </item><item>1. [ ] </item>
+      <item>[^note]: </item><item>*[HTML]: </item>
+      <item>&gt; [!NOTE]</item><item>&gt; [!TIP]</item><item>&gt; [!IMPORTANT]</item><item>&gt; [!WARNING]</item><item>&gt; [!CAUTION]</item>
+      <item>## Heading {#id}</item><item>??? note "Details"</item>
+      <item>==highlight==</item><item>~~strikethrough~~</item><item>^superscript^</item><item>^^inserted^^</item>
+      <item>| Header | Header |</item><item>| :--- | ---: |</item>
+      <item>&#96;&#96;&#96;python</item><item>&#96;&#96;&#96;bash</item><item>&#96;&#96;&#96;&#96;&#96;python</item>
+      <item>/!!!/</item><item>/col//</item><item>/col#</item><item>/col:#</item>
+      <item>||||[</item><item>]||||</item>
       <item>[[==&gt;&gt;]]</item><item>[[&lt;&lt;==]]</item><item>[[&lt;=&gt;&gt;]]</item><item>&gt;&gt; </item>
       <item>//hl//</item><item>/red//</item><item>/rbw//</item><item>/bar//</item><item>//key//</item>
       <item>:fire:</item><item>:check:</item><item>:warn:</item>
