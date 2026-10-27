@@ -57,9 +57,15 @@ mdxl-preview opens a local preview and refreshes when the document changes. Usef
 
 ## Docs and development
 
-- [Syntax reference](docs/syntax.md)
-- [Installation and troubleshooting](docs/installation.md)
-- [Renderers and editor support](docs/renderers.md)
+**[Open the full MDXL site](https://trail-b1az3r.github.io/mdxl/)**
+
+- [Getting started guide](https://trail-b1az3r.github.io/mdxl/guide/)
+- [Interactive syntax reference](https://trail-b1az3r.github.io/mdxl/syntax/)
+- [Installation and troubleshooting](https://trail-b1az3r.github.io/mdxl/installation/)
+- [Terminal, browser, and Kate renderers](https://trail-b1az3r.github.io/mdxl/renderers/)
+- [Practical examples](https://trail-b1az3r.github.io/mdxl/examples/)
+- [Project principles and contributing](https://trail-b1az3r.github.io/mdxl/about/)
+- [Markdown syntax guide in the repository](docs/syntax.md)
 - [Example document](demo.mdxl)
 
 ```bash
