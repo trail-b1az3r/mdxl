@@ -1,2 +1,24 @@
-/!!!/ Hello MDXL World 42 /!!!/
-/rbw// rainbow //rbw//  /bar//70//  :fire:  //key// Ctrl+C //key//
+# MDXL — quick tour
+
+-# Plain text, expressive output
+-## One document, several renderers
+-### Explore the extra layer
+
+#### Syntax that stays readable
+
+A signal: /col//green light /col#B7F77A// and //hl//something to notice//hl//.
+
+Try /rbw//rainbow text//rbw//, /red//deprecated wording/red//, or a shortcut such as //key//Ctrl+C//key//.
+
+Progress: /bar//72//. Hidden note: ||||[you found the invisible ink]||||.
+
+This text flips: /!!!/Hello MDXL 42/!!!/
+
+Navigate [[==>>]] forward, [[<<==]] backward, or use [[<=>>]] when both directions matter.
+
+:check: Standard Markdown still works: **bold**, *italic*, inline code, lists, links, and tables.
+
+`````python
+# Five backticks make a copyable MDXL code block.
+print("Nothing runs automatically.")
+```
