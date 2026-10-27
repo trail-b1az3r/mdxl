@@ -44,7 +44,7 @@ class TerminalRendererTests(unittest.TestCase):
 
     def test_flip_uses_terminal_friendly_digit_mappings(self):
         rendered = render_terminal("/!!!/Hello MDXL 42 7/!!!/")
-        for unsupported in ("\\u1105", "\\u3134", "\\u02e5", "\\u3105"):
+        for unsupported in (chr(0x1105), chr(0x3134), chr(0x02e5), chr(0x3105)):
             self.assertNotIn(unsupported, rendered)
         self.assertIn("ollǝH", rendered)
 
