@@ -56,6 +56,8 @@ This is ~~~~striped-through text~~~~."""
         self.assertIn('data-target="en"', translated)
         self.assertIn("Hola, mundo.", translated)
         self.assertIn("fetch('/__translate'", translated)
+        self.assertIn(r"/\bcomputadora\b/gi", translated)
+        self.assertNotIn(chr(8), translated)
 
         pirate = render_mdxl("//autoT//Hello friend//joke1")
         self.assertIn('class="mdxl-joke-translation"', pirate)
