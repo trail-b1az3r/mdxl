@@ -13,7 +13,10 @@ const samples = [
   {name:"Invisible ink",source:"||||[hidden in plain sight]||||",description:"Hover or keyboard-focus the words in a browser preview to reveal them.",preview:<span className="invisible">hidden in plain sight</span>},
   {name:"Upside down",source:"/!!!/turn it around/!!!/",description:"Flip supported glyphs into an upside-down Unicode approximation.",preview:<span className="flip">uʍop ǝpᴉsdn</span>},
   {name:"Headings",source:"-# Micro one\n-## Micro two\n-### Micro three\n#### Subheading",description:"The three micro-header levels coexist with standard Markdown #### headings.",preview:<span className="heading-sample"><small>MICRO ONE</small><i>Micro two</i><em>Micro three</em><strong>Subheading</strong></span>},
-  {name:"Directional arrows",source:"[[==>>]] [[<<==]] [[<=>>]]",description:"Tap the arrows in a rendered document to cycle the direction.",preview:<span className="arrows">➜　⬅　⇄</span>}
+  {name:"Directional arrows",source:"[[==>>]] [[<<==]] [[<=>>]]",description:"Tap the arrows in a rendered document to cycle the direction.",preview:<span className="arrows">➜　⬅　⇄</span>},
+  {name:"GFM checklist",source:"- [x] shipped\n- [ ] next",description:"Standard task list syntax renders as a checked or unchecked box in the browser preview.",preview:<span className="gfm-check-demo"><span><i>✓</i> shipped</span><span><i/> next</span></span>},
+  {name:"Strikethrough",source:"~~old approach~~",description:"GFM double tildes mark text as superseded without needing MDXL's own redaction token.",preview:<span className="gfm-strike-demo"><del>old approach</del><b>new baseline</b></span>},
+  {name:"Markdown Extra",source:"A note.[^1]\n\n[^1]: Footnote details",description:"Footnotes, definition lists, abbreviations, and custom heading IDs work in the browser renderer.",preview:<span className="gfm-footnote-demo"><span>A note.<sup>1</sup></span><small><b>1</b> Footnote details</small></span>}
 ];
 
 const featureCards = [
@@ -23,7 +26,75 @@ const featureCards = [
   ["04","A place in your editor","Kate's KSyntaxHighlighting definition brings token colors and completions into the writing flow."]
 ];
 
-function App() {
+
+const BASE = "/mdxl/";
+const ICON = BASE + "mdxl-mark.svg";
+const docPages = [
+ {id:"guide",label:"Guide",kicker:"START HERE",title:"A little extra meaning.",intro:"MDXL keeps Markdown familiar and gives it a small expressive layer for the information you want people to notice.",sections:[
+  {eyebrow:"THE MENTAL MODEL",title:"Write the source first.",body:"An MDXL file is still a text file. Its delimiters are visible, diff cleanly in version control, and remain understandable even when a renderer is not installed. Use regular Markdown wherever it already does the job."},
+  {eyebrow:"YOUR FIRST RENDER",title:"Three steps from source to preview.",body:"Install the tools, open the sample, and choose the renderer you need. The terminal renderer is fast for text-first workflows; the browser preview adds richer styling and refreshes after saves.",code:"chmod +x install.sh\n./install.sh\nmdxl-cli demo.mdxl\nmdxl-preview demo.mdxl"},
+  {eyebrow:"GOOD PRACTICE",title:"Add emphasis, not noise.",body:"Pick one or two styles for a document and use them consistently. Use color for status, highlights for important takeaways, and progress bars for a measurable quantity. Keep the underlying words meaningful without decoration."}]},
+ {id:"syntax",label:"Syntax",kicker:"REFERENCE / 01",title:"The extra layer, token by token.",intro:"A practical reference to MDXL's custom syntax, including the three micro-header levels and the independent Markdown level-four heading.",sections:[
+  {eyebrow:"HEADINGS",title:"The complete heading family.",body:"Dash-prefixed headings are deliberately compact variants. The four-hash heading remains standard Markdown level four and must not be consumed as a micro-heading.",table:[["Source","Use"],["-# Heading","Micro-header · level 1"],["-## Heading","Micro-header · level 2"],["-### Heading","Micro-header · level 3"],["#### Heading","Markdown heading · level 4"]]},
+  {eyebrow:"INLINE TEXT",title:"Style a phrase.",body:"Pair the opening delimiter with its matching closing delimiter. The color token includes a six-digit hex color; other effects use short, memorable markers.",table:[["Source token","Effect"],["/col//Signal /col#B7F77A//","Hex true color"],["/rbw//Spectrum//rbw//","Rainbow, character by character"],["//hl//Important//hl//","Highlight"],["/red//Old wording/red//","Strikethrough styling"],["//key//Ctrl+C//key//","Keyboard keycap"],["||||[Hidden note]||||","Invisible ink in the preview"],["/!!!/Turn around/!!!/","Upside-down Unicode approximation"]]},
+  {eyebrow:"INLINE CUES",title:"Add a quick signal.",body:"Progress values are limited to 0–100. Arrow tokens display direction glyphs and can cycle in the browser renderer. Supported shortcode examples include :check:, :rocket:, :warn:, :fire:, and :star:; unsupported names are kept as written.",table:[["Token","Meaning"],["/bar//72//","Progress at 72%"],["[[==>>]]","Right arrow"],["[[<<==]]","Left arrow"],["[[<=>>]]","Bidirectional arrow"]]},
+  {eyebrow:"CODE PRESENTATION",title:"Code that waits for its reader.",body:"A five-backtick block creates a dedicated code panel in the preview. The language label is a presentation hint, not an execution request. Nothing inside a document runs automatically."}]},
+ {id:"markdown",label:"Markdown",kicker:"COMPATIBILITY / 02",title:"Markdown, fully extended.",intro:"MDXL's browser renderer combines the expressive MDXL tokens with GFM checklists and links, Markdown Extra-style reference features, and a few optional inline conveniences.",sections:[
+  {eyebrow:"GITHUB FLAVORED MARKDOWN",title:"The familiar GitHub toolbox.",body:"Use aligned tables, nested task lists, double-tilde strikethrough, bare URL and email autolinks, and GitHub-style alert callouts. Checkboxes are display-only; the local preview does not synchronize with GitHub issues.",table:[["Syntax","What it adds"],["- [x] Done","Completed task checkbox"],["- [ ] Next","Unchecked task checkbox"],["~~old wording~~","Strikethrough"],["https://example.com","Bare URL autolink"],["> [!NOTE]","Styled alert callout"]]},
+  {eyebrow:"CHECKLISTS AND ALERTS",title:"Use status syntax in real documents.",body:"GFM callout types include NOTE, TIP, IMPORTANT, WARNING, and CAUTION. Start with the quote marker, then prefix each body line with a greater-than sign.",code:"- [x] Restore parser behavior\n- [ ] Review terminal output\n\n> [!TIP]\n> Keep the source readable. Add emphasis when it communicates something."},
+  {eyebrow:"MARKDOWN EXTRA",title:"Add references without clutter.",body:"The preview supports footnotes, definition lists, abbreviations, attribute lists, and stable heading IDs. These are useful in changelogs, technical notes, and longer project documentation.",code:"## Stable heading {#stable-heading}\n\nMDXL supports a note[^1].\n\n[^1]: This becomes a linked footnote.\n\nMDXL\n: Markdown with an expressive layer.\n\n*[GFM]: GitHub Flavored Markdown"},
+  {eyebrow:"INLINE CONVENIENCES",title:"More than basic emphasis.",body:"The preview also supports double-equals highlighting, caret superscript, inserted text, and collapsible details. These are renderer extensions, not universal syntax across every Markdown editor.",code:"==Important==\nH^2^O\n^^new wording^^\n\n??? note \"More context\"\n    This content is collapsible."},
+  {eyebrow:"COMPATIBILITY BOUNDARIES",title:"A safe local renderer, not GitHub itself.",body:"Raw HTML tags are escaped and the rendered output is sanitized. GitHub-specific @mentions, issue or pull-request references, and other repository-relative shortcuts are not resolved because a standalone file does not supply repository context. The terminal renderer focuses on MDXL tokens, checklist markers, and strikethrough; it keeps other structural Markdown readable as text."}
+]},
+ {id:"installation",label:"Install",kicker:"SETUP / 02",title:"From clone to command line.",intro:"Install MDXL without administrator access. The installer keeps the preview dependency in its own virtual environment instead of modifying system Python.",sections:[
+  {eyebrow:"REQUIREMENTS",title:"A small local toolchain.",body:"Use Python 3.9 or newer and a Linux shell for the provided installer. Kate is optional; it is only needed for the editor syntax integration. The preview renderer uses Python Markdown."},
+  {eyebrow:"INSTALL",title:"Run the bundled installer.",body:"Run these commands from the repository root, where install.sh, mdxl_cli.py, mdxl_preview.py, and mdxl.xml live.",code:"chmod +x install.sh\n./install.sh"},
+  {eyebrow:"MANUAL PREVIEW DEPENDENCY",title:"Keep it out of system Python.",body:"The installer creates a dedicated virtual environment under ~/.local/share/mdxl/venv. For a manual development environment, install from the repository's requirements file.",code:"python3 -m venv .venv\n. .venv/bin/activate\npython -m pip install -r requirements-preview.txt"},
+  {eyebrow:"TROUBLESHOOTING",title:"When commands are not found.",body:"Check that ~/.local/bin is on PATH, then open a new terminal or source your shell profile. If Kate does not highlight .mdxl files, confirm mdxl.xml is in the per-user KSyntaxHighlighting directory and restart Kate. If the preview port is busy, choose another starting port."}]},
+ {id:"renderers",label:"Renderers",kicker:"TOOLS / 03",title:"One source, different surfaces.",intro:"Choose a renderer based on what you need: read in a terminal, review a live preview, export HTML, or edit with token-aware highlighting.",sections:[
+  {eyebrow:"TERMINAL",title:"mdxl-cli",body:"The terminal renderer maps supported tokens to ANSI colors and Unicode. It has no HTML dependency and never executes code, so it works well for a quick review or terminal-first workflow.",code:"mdxl-cli demo.mdxl"},
+  {eyebrow:"LOCAL BROWSER",title:"mdxl-preview",body:"The browser renderer serves the document on 127.0.0.1, opens the local preview by default, and refreshes after the file changes. If the starting port is busy, it tries up to nine subsequent ports.",code:"mdxl-preview demo.mdxl\nmdxl-preview demo.mdxl --no-open --port 8420"},
+  {eyebrow:"OUTPUT MODES",title:"Preview, export, or pipe.",body:"The --stdout option prints rendered HTML to standard output. --export writes HTML to a file and accepts an optional output path. The --live flag enables save-and-refresh polling.",code:"mdxl-preview demo.mdxl --stdout\nmdxl-preview demo.mdxl --export\nmdxl-preview demo.mdxl --export ./demo.html"},
+  {eyebrow:"EDITOR",title:"Kate syntax and completions.",body:"The mdxl.xml definition registers .mdxl, highlights custom tokens and headings, and provides completion suggestions. It is installed in the user's syntax-highlighting directory; restart Kate after installation."}]},
+ {id:"examples",label:"Examples",kicker:"PATTERNS / 04",title:"Ready-made patterns to borrow.",intro:"MDXL is most useful when each effect carries meaning. Start with these small patterns, then adapt their source to your own documents.",sections:[
+  {eyebrow:"PROJECT STATUS",title:"A compact status note.",body:"Use a color for build state, a highlight for the next action, and a progress bar for a measurable checkpoint.",code:"-# RELEASE STATUS\nBuild: /col//passing /col#B7F77A//\nNext action: //hl//verify docs deployment//hl//\nProgress: /bar//72//"},
+  {eyebrow:"CHANGELOG",title:"Make a release readable at a glance.",body:"Keep the standard Markdown hierarchy, then use compact headings to group small details. The four-hash heading remains a normal Markdown heading.",code:"## 1.4.0\n\n-# Added\n- Interactive syntax reference\n- Copyable preview code\n\n-## Fixed\n- Restored #### heading support\n- Better preview install isolation\n\n#### Notes\n- Existing Markdown stays readable."},
+  {eyebrow:"DOCUMENTATION",title:"Call out the important line.",body:"Put a clear highlight next to useful context instead of decorating every paragraph.",code:"#### Before you begin\nInstall the CLI first, then //hl//run the preview against a real file//hl//.\n\nShortcut: //key//Ctrl+C//key//"},
+  {eyebrow:"REVIEW A NOTE",title:"Hide spoilers, not meaning.",body:"Invisible ink works best for a spoiler, answer, or optional note. It reveals on hover or keyboard focus in the browser preview; in a terminal it uses dark ANSI foreground and background.",code:"Answer: ||||[42]||||\n\nGo to the next step [[==>>]]"}]},
+ {id:"about",label:"About",kicker:"PROJECT / 05",title:"Plain-text first, by design.",intro:"MDXL is a small Markdown extension project. Its aim is to add visual emphasis without making the document depend on a complex editor or a web runtime.",sections:[
+  {eyebrow:"PRINCIPLE 01",title:"Readable source comes first.",body:"The tokens are short and visible, so a document remains a text file that can be reviewed, diffed, and maintained in Git. Markdown is the baseline rather than something to replace."},
+  {eyebrow:"PRINCIPLE 02",title:"Renderers should be predictable.",body:"The terminal renderer maps syntax to text and ANSI sequences. The browser renderer decorates content, escapes raw HTML tags, and displays five-backtick code blocks as copyable code. The preview never executes document code automatically."},
+  {eyebrow:"PRINCIPLE 03",title:"Keep the tools local.",body:"Preview serves on loopback rather than exposing the document to the local network. Static HTML export gives a portable artifact when a live server is not needed."},
+  {eyebrow:"CONTRIBUTING",title:"Small fixes, validated behavior.",body:"When making changes, update the renderer tests and syntax guide together. Run the Python unit tests, validate mdxl.xml, and build the Vite site before opening a pull request.",code:"python -m unittest discover -s tests -v\npython -m py_compile mdxl_cli.py mdxl_preview.py\ncd website && npm run build"}]}
+];
+function BrandMark(){return <img className="brand-svg" src={ICON} alt="" width="34" height="34"/>;}
+function SiteNav({current="home"}){
+ return <header className="nav"><a className="logo" href={BASE} aria-label="MDXL home"><BrandMark/><span>MDXL</span></a><nav aria-label="Main navigation">{docPages.map(p=><a key={p.id} className={current===p.id?"nav-current":""} href={BASE+p.id+"/"}>{p.label}</a>)}<a className="github" href="https://github.com/trail-b1az3r/mdxl" target="_blank" rel="noreferrer">GitHub <span>↗</span></a></nav></header>;
+}
+function SiteFooter(){return <footer className="footer wrap"><a className="logo" href={BASE}><BrandMark/><span>MDXL</span></a><p>Plain text, with a little more intention.</p><div><a href="https://github.com/trail-b1az3r/mdxl">GitHub ↗</a><a href={BASE+"syntax/"}>Syntax reference ↗</a><a href="https://github.com/trail-b1az3r/mdxl/blob/main/LICENSE">MIT license ↗</a></div><small>MDXL · OPEN SOURCE</small></footer>;}
+function CopyCode({text,label="Copy example"}){
+ const [copied,setCopied]=useState(false);
+ async function run(){try{await navigator.clipboard.writeText(text);setCopied(true);window.setTimeout(()=>setCopied(false),1400);}catch{setCopied(false);}}
+ return <button className="copy-button" onClick={run}>{copied?"Copied":label} <span>↗</span></button>;
+}
+function DocumentationPage({page}){
+ const [tocOpen,setTocOpen]=useState(false);
+ return <div className="app-shell docs-shell"><SiteNav current={page.id}/><main>
+  <section className="doc-hero wrap"><div className="doc-kicker"><span className="doc-kicker-mark"><BrandMark/></span><span>{page.kicker} <i/> MDXL DOCUMENTATION</span></div><h1>{page.title}</h1><p>{page.intro}</p><div className="doc-hero-meta"><span className="tonal-chip">Plain-text first</span><span className="tonal-chip lavender">Open source</span><span className="tonal-chip blue">Local renderers</span></div></section>
+  <div className="doc-layout wrap"><aside className="doc-sidebar"><div className="sidebar-heading">EXPLORE MDXL</div>{docPages.map((p,i)=><a key={p.id} className={p.id===page.id?"side-link side-active":"side-link"} href={BASE+p.id+"/"}><span>{String(i+1).padStart(2,"0")}</span>{p.label}<b>{p.id===page.id?"●":"↗"}</b></a>)}<div className="sidebar-card"><span className="sidebar-orb">M<span>D</span></span><b>Learn by example</b><p>Open the interactive syntax explorer to inspect and copy a token.</p><a href={BASE+"#explore"}>Explore syntax ↗</a></div></aside>
+   <article className="doc-content"><div className="doc-content-top"><span>MDXL / {page.id.toUpperCase()}</span><button className="toc-toggle" onClick={()=>setTocOpen(v=>!v)}>{tocOpen?"Hide contents":"On this page"} <span>{tocOpen?"−":"+"}</span></button></div>{tocOpen&&<div className="toc-panel">{page.sections.map((s,i)=><a key={s.title} href={"#section-"+i}>{s.title}</a>)}</div>}
+   {page.sections.map((s,i)=><section className="doc-section" id={"section-"+i} key={s.title}><div className="doc-eyebrow"><span>{String(i+1).padStart(2,"0")}</span>{s.eyebrow}</div><h2>{s.title}</h2><p>{s.body}</p>{s.code&&<div className="doc-code"><div><span>SOURCE</span><CopyCode text={s.code}/></div><pre><code>{s.code}</code></pre></div>}{s.table&&<div className="doc-table-wrap"><table><thead><tr>{s.table[0].map(v=><th key={v}>{v}</th>)}</tr></thead><tbody>{s.table.slice(1).map((row,j)=><tr key={j}>{row.map((v,k)=><td key={k}>{k===0?<code>{v}</code>:v}</td>)}</tr>)}</tbody></table></div>}</section>)}
+   <div className="doc-next"><div><span className="kicker">KEEP EXPLORING</span><h3>{page.id==="syntax"?"Try the patterns in context.":"Open the syntax reference."}</h3><p>Move from the guide to the interactive specimen and see how MDXL tokens read when rendered.</p></div><a href={BASE+(page.id==="syntax"?"examples/":"syntax/")}>Continue ↗</a></div>
+  </article></div></main><SiteFooter/></div>;
+}
+function SiteRouter(){
+ const path=window.location.pathname.replace(/^\/mdxl\/?/,"").replace(/\/+$/,"");
+ const slug=path.split("/")[0]||"home";
+ const page=docPages.find(p=>p.id===slug);
+ return page?<DocumentationPage page={page}/>:<HomePage/>;
+}
+
+function HomePage() {
   const [selected,setSelected] = useState(0);
   const [notice,setNotice] = useState("");
   async function copy(text) {
@@ -38,10 +109,7 @@ function App() {
   }
   const item=samples[selected];
   return <div className="app-shell">
-    <header className="nav">
-      <a className="logo" href="#home"><span className="logo-icon">M<span>D</span></span> MDXL</a>
-      <nav aria-label="Main navigation"><a href="#why">Why MDXL</a><a href="#explore">Syntax</a><a href="#install">Get started</a><a className="github" href="https://github.com/trail-b1az3r/mdxl" target="_blank" rel="noreferrer">GitHub <span>↗</span></a></nav>
-    </header>
+    <SiteNav/>
     <main>
       <section className="hero wrap" id="home">
         <div className="hero-copy">
@@ -98,11 +166,12 @@ function App() {
       </section>
 
       <section className="safety-note"><div className="wrap safety-inner"><div><span className="kicker">A NOTE ON CODE BLOCKS</span><h2>Show the code.<br/><em>Don't surprise the reader.</em></h2></div><p>Five-backtick MDXL blocks are presented as copyable code in the browser preview. They do not run automatically. Execution belongs to an explicit user action outside the renderer.</p></div></section>
-    </main>
-    <footer className="footer wrap"><a className="logo" href="#home"><span className="logo-icon">M<span>D</span></span> MDXL</a><p>Plain text, with a little more intention.</p><div><a href="https://github.com/trail-b1az3r/mdxl">GitHub ↗</a><a href="https://github.com/trail-b1az3r/mdxl/blob/main/docs/syntax.md">Syntax reference ↗</a><a href="https://github.com/trail-b1az3r/mdxl/blob/main/LICENSE">MIT license ↗</a></div><small>MDXL · OPEN SOURCE</small>
-    </footer>
+    <section className="section wrap more-reading"><div className="section-title"><div><span className="kicker">GO A LITTLE DEEPER</span><h2>There's more<br/><em>in the docs.</em></h2></div><p>A growing guide to the syntax, tools, examples, and practical ways to use MDXL.</p></div><div className="reading-grid">{docPages.map((p,i)=><a className={"reading-card reading-"+i} key={p.id} href={BASE+p.id+"/"}><span>{String(i+1).padStart(2,"0")} / {p.kicker}</span><h3>{p.label}</h3><p>{p.intro}</p><b>Explore page ↗</b></a>)}</div></section>
+  <section className="section wrap more-reading"><div className="section-title"><div><span className="kicker">GO A LITTLE DEEPER</span><h2>There's more<br/><em>in the docs.</em></h2></div><p>A growing guide to the syntax, tools, examples, and practical ways to use MDXL.</p></div><div className="reading-grid">{docPages.map((p,i)=><a className={"reading-card reading-"+i} key={p.id} href={BASE+p.id+"/"}><span>{String(i+1).padStart(2,"0")} / {p.kicker}</span><h3>{p.label}</h3><p>{p.intro}</p><b>Explore page ↗</b></a>)}</div></section>
+  </main>
+    <SiteFooter/>
     {notice && <div className="toast" role="status">{notice}</div>}
   </div>;
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(<SiteRouter />);

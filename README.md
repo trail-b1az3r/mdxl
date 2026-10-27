@@ -10,7 +10,9 @@
 ## Features
 
 - True-color and rainbow text, highlights, redaction, keyboard keycaps, invisible ink, and upside-down text.
-- Progress bars, interactive arrow glyphs, and shortcode replacements.
+- Progress bars, interactive arrow glyphs, shortcode replacements, and copyable code blocks.
+- Common Markdown plus GFM task lists, strikethrough, autolinks, aligned tables, and alert callouts.
+- Markdown Extra-style footnotes, definition lists, abbreviations, heading IDs, and attribute lists; plus highlight, superscript, insertion, and collapsible details.
 - Three micro-header levels (`-#`, `-##`, `-###`) plus the `####` subheading.
 - Terminal rendering with mdxl-cli and browser rendering with mdxl-preview.
 - Kate syntax highlighting and completion suggestions.
@@ -40,6 +42,8 @@ mdxl-preview opens a local preview and refreshes when the document changes. Usef
 
 ## Syntax quick reference
 
+MDXL builds on [GitHub Flavored Markdown](https://github.github.com/gfm/) and [Markdown Extra-style extensions](https://python-markdown.github.io/extensions/extra/). See the [complete syntax guide](https://trail-b1az3r.github.io/mdxl/syntax/) for examples and compatibility notes.
+
 | Syntax | Effect |
 | --- | --- |
 | `-# Heading`, `-## Heading`, `-### Heading` | Three micro-header levels |
@@ -57,9 +61,16 @@ mdxl-preview opens a local preview and refreshes when the document changes. Usef
 
 ## Docs and development
 
-- [Syntax reference](docs/syntax.md)
-- [Installation and troubleshooting](docs/installation.md)
-- [Renderers and editor support](docs/renderers.md)
+**[Open the full MDXL site](https://trail-b1az3r.github.io/mdxl/)**
+
+- [Getting started guide](https://trail-b1az3r.github.io/mdxl/guide/)
+- [Interactive syntax reference](https://trail-b1az3r.github.io/mdxl/syntax/)
+- [Extended Markdown and GFM compatibility](https://trail-b1az3r.github.io/mdxl/markdown/)
+- [Installation and troubleshooting](https://trail-b1az3r.github.io/mdxl/installation/)
+- [Terminal, browser, and Kate renderers](https://trail-b1az3r.github.io/mdxl/renderers/)
+- [Practical examples](https://trail-b1az3r.github.io/mdxl/examples/)
+- [Project principles and contributing](https://trail-b1az3r.github.io/mdxl/about/)
+- [Markdown syntax guide in the repository](docs/syntax.md)
 - [Example document](demo.mdxl)
 
 ```bash

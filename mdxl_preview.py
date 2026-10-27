@@ -12,8 +12,10 @@ from pathlib import Path
 
 try:
     import markdown
+    import bleach
+    from bleach.css_sanitizer import CSSSanitizer
 except ImportError:
-    sys.exit("The preview requires Python Markdown. Install requirements-preview.txt or run ./install.sh.")
+    sys.exit("The preview requires Markdown, PyMdown Extensions, and Bleach. Install requirements-preview.txt or run ./install.sh.")
 
 UPSIDE_DOWN = str.maketrans({
     "a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ","k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ","u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z",
@@ -49,6 +51,7 @@ table{border-collapse:collapse;width:100%;display:block;overflow:auto}th,td{bord
 .mdxl-rainbow span{font-weight:750}.mdxl-progress{display:inline-flex;vertical-align:middle;width:180px;max-width:60vw;height:10px;border:1px solid #4b5743;border-radius:99px;background:#272d24;overflow:hidden;margin:0 .45rem}.mdxl-progress span{display:block;background:var(--lime);border-radius:inherit}.mdxl-progress-label{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.88em}
 .invisible-ink{display:inline-block;padding:0 .35em;border-radius:4px;background:#252a22;cursor:help;outline-offset:3px}.ink-char{color:transparent;background:#252a22;border-radius:2px;transition:color .18s ease,background .18s ease}.invisible-ink:hover .ink-char,.invisible-ink:focus .ink-char{color:#edf8e6;background:transparent}
 .upside-down{display:inline-block;unicode-bidi:plaintext}.arrow{border:0;background:transparent;color:var(--blue);font-size:1.2em;font-weight:700;cursor:pointer;padding:0 .15em;border-radius:5px}.arrow:hover{background:#24313b}.exec-block{margin:1.25rem 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0d0b}.exec-header{display:flex;justify-content:space-between;align-items:center;padding:.55rem .8rem;color:var(--muted);background:#1a2018;border-bottom:1px solid var(--line);font:600 .78rem ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}.copy-code{border:1px solid #45513d;background:#252f20;color:var(--lime);padding:.35rem .65rem;border-radius:7px;cursor:pointer;font:inherit;text-transform:none;letter-spacing:0}.exec-block pre{margin:0;border:0;border-radius:0}
+ul.task-list{list-style:none;padding-left:1.25rem}.task-list-item{list-style:none;margin-left:-1.25rem}.task-list-item input[type=checkbox]{margin:0 .55rem .15rem 0;accent-color:var(--lime);vertical-align:middle}del{text-decoration:line-through;text-decoration-thickness:2px;color:#a2ad9b}ins{color:var(--lime);text-decoration:underline;text-decoration-style:dotted}abbr[title]{text-decoration:underline dotted;cursor:help}dl{margin:1rem 0}dt{font-weight:750;color:#e5efd9;margin-top:.8rem}dd{margin:.25rem 0 .75rem 1.5rem;color:var(--muted)}.footnote-ref,.footnote-backref{color:var(--lime);font-size:.8em}.footnote{border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem;font-size:.9em;color:var(--muted)}.admonition{margin:1.2rem 0;border:1px solid #46553a;border-left:4px solid var(--lime);border-radius:5px 16px 16px 5px;padding:.85rem 1.1rem;background:#c0f4770b}.admonition>.admonition-title{font-weight:750;color:var(--lime);margin-bottom:.45rem}.admonition.tip{border-left-color:#88d1ff;background:#88d1ff0b}.admonition.tip>.admonition-title{color:#88d1ff}.admonition.important{border-left-color:#b8a2ff;background:#b8a2ff0b}.admonition.important>.admonition-title{color:#b8a2ff}.admonition.warning,.admonition.caution{border-left-color:#ffb86b;background:#ffb86b0b}.admonition.warning>.admonition-title,.admonition.caution>.admonition-title{color:#ffb86b}details{border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;margin:1rem 0;background:#181d16}details>summary{cursor:pointer;color:var(--lime);font-weight:700}details[open]>summary{margin-bottom:.6rem}mark{background:#d7fb81;color:#17210e;border-radius:4px;padding:0 .2em}sup,sub{line-height:0}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 """
@@ -59,16 +62,70 @@ def escape_source_html(content):
     return re.sub(r"</?([A-Za-z][A-Za-z0-9-]*)(\s[^<>]*?)?/?>", lambda match: html.escape(match.group(0)), content)
 
 
+
+def expand_gfm_alerts(content):
+    """Translate GitHub-style > [!NOTE] callouts into safe Markdown admonitions."""
+    def convert(match):
+        lines = [re.sub(r"^\s*>\s?", "", line) for line in match.group(0).splitlines()]
+        if not lines:
+            return match.group(0)
+        marker = re.fullmatch(r"\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]", lines[0].strip(), flags=re.IGNORECASE)
+        if not marker:
+            return match.group(0)
+        kind = marker.group(1).lower()
+        title = kind.title()
+        body_lines = lines[1:]
+        indented = "\n".join(("    " + line) if line.strip() else "" for line in body_lines)
+        if not indented.strip():
+            return f'!!! {kind} "{title}"\n'
+        return f'!!! {kind} "{title}"\n{indented}\n'
+
+    return re.sub(r"(?m)(?:^>[^\n]*(?:\n|$))+", convert, content)
+
+
+def sanitize_rendered_html(fragment):
+    """Allow Markdown output while stripping unsafe elements, attributes, and URL schemes."""
+    allowed_tags = set(bleach.sanitizer.ALLOWED_TAGS) | {
+        "h1", "h2", "h3", "h4", "h5", "h6", "p", "div", "span", "section",
+        "article", "blockquote", "hr", "br", "pre", "code", "del", "ins",
+        "mark", "kbd", "sup", "sub", "ul", "ol", "li", "input", "table",
+        "thead", "tbody", "tr", "th", "td", "dl", "dt", "dd", "abbr",
+        "details", "summary", "label", "button",
+    }
+    safe_names = {
+        "class", "id", "title", "href", "src", "alt", "width", "height",
+        "colspan", "rowspan", "align", "start", "type", "checked", "disabled",
+        "rel", "open", "role", "tabindex", "scope", "for", "data-arrow",
+    }
+
+    def allow_attribute(tag, name, value):
+        if name in safe_names or name.startswith(("aria-", "data-")):
+            return True
+        if name == "style":
+            return tag in {"span", "p", "h1", "h2", "h3", "h4", "h5", "h6", "th", "td"}
+        return False
+
+    cleaner = bleach.Cleaner(
+        tags=allowed_tags,
+        attributes=allow_attribute,
+        protocols={"http", "https", "mailto", "ftp"},
+        strip=True,
+        css_sanitizer=CSSSanitizer(allowed_css_properties=["color", "width", "text-align", "background-color"]),
+    )
+    return cleaner.clean(fragment)
+
 def render_mdxl(content, live=False):
-    """Render MDXL syntax and Markdown into a self-contained HTML document."""
-    content = escape_source_html(content)
+    """Render MDXL, GitHub Flavored Markdown, and Markdown Extra safely."""
     code_blocks = []
+    exec_blocks = []
 
     def process_exec(match):
         lang = (match.group(1) or "text").strip() or "text"
-        return ('<div class="exec-block"><div class="exec-header"><span>' + html.escape(lang)
-                + '</span><button type="button" class="copy-code">Copy code</button></div><pre><code>'
-                + html.escape(match.group(2)) + '</code></pre></div>')
+        rendered = ('<div class="exec-block"><div class="exec-header"><span>' + html.escape(lang)
+                    + '</span><button type="button" class="copy-code">Copy code</button></div><pre><code>'
+                    + html.escape(match.group(2)) + '</code></pre></div>')
+        exec_blocks.append(rendered)
+        return "\n\nMDXLEXECBLOCK" + str(len(exec_blocks) - 1) + "TOKEN\n\n"
 
     content = re.sub(
         r"(?ms)^`{5}([a-zA-Z0-9_+-]*)[ \t]*\n(.*?)^`{5}[ \t]*$".replace("`", chr(96)),
@@ -83,6 +140,8 @@ def render_mdxl(content, live=False):
         r"(?ms)^[ \t]*(`{3,4}(?!`)|~{3,})[^\n]*\n.*?^[ \t]*\1[ \t]*$".replace("`", chr(96)),
         hold_fence, content,
     )
+    # Escape raw HTML only after protecting fenced code, so code remains readable.
+    content = escape_source_html(content)
 
     def colored(match):
         return '<span class="mdxl-color" style="color:#' + match.group(2) + '">' + html.escape(match.group(1)) + "</span>"
@@ -131,11 +190,37 @@ def render_mdxl(content, live=False):
     content = re.sub(r"^(-##)\s(.*)$", r'<h5 class="mdxl-micro-2">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(-###)\s(.*)$", r'<h5 class="mdxl-micro-3">\2</h5>', content, flags=re.MULTILINE)
 
-    body = markdown.markdown(content, extensions=["fenced_code", "tables", "nl2br", "sane_lists"])
+    content = expand_gfm_alerts(content)
+    body = markdown.markdown(
+        content,
+        extensions=[
+            "extra",                 # Markdown Extra: tables, footnotes, definitions, abbreviations, heading attributes
+            "sane_lists",
+            "nl2br",
+            "admonition",            # also used for GitHub-style alert blocks
+            "pymdownx.tasklist",     # GFM [ ] and [x] task lists
+            "pymdownx.tilde",        # GFM ~~strikethrough~~; subscript deliberately disabled
+            "pymdownx.magiclink",     # bare URL and email autolinks
+            "pymdownx.caret",        # superscript and inserted text
+            "pymdownx.mark",         # ==highlight==
+            "pymdownx.details",      # collapsible details blocks
+            "toc",
+        ],
+        extension_configs={
+            "pymdownx.tasklist": {"clickable_checkbox": False},
+            "pymdownx.tilde": {"subscript": False, "delete": True, "smart_delete": True},
+            "pymdownx.magiclink": {"repo_url_shorthand": False, "social_url_shorthand": False},
+            "toc": {"permalink": True},
+        },
+    )
     for index, block in enumerate(code_blocks):
         marker = "MDXLRAWBLOCK" + str(index) + "TOKEN"
-        rendered = markdown.markdown(block, extensions=["fenced_code"])
+        rendered = markdown.markdown(block, extensions=["extra", "sane_lists"])
         body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    for index, rendered in enumerate(exec_blocks):
+        marker = "MDXLEXECBLOCK" + str(index) + "TOKEN"
+        body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    body = sanitize_rendered_html(body)
 
     script = """
 <script>
