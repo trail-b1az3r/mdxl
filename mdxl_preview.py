@@ -56,6 +56,7 @@ table{border-collapse:collapse;width:100%;display:block;overflow:auto}th,td{bord
 .invisible-ink{display:inline-block;padding:0 .35em;border-radius:4px;background:#252a22;cursor:help;outline-offset:3px}.ink-char{color:transparent;background:#252a22;border-radius:2px;transition:color .18s ease,background .18s ease}.invisible-ink:hover .ink-char,.invisible-ink:focus .ink-char{color:#edf8e6;background:transparent}
 .upside-down{display:inline-block;unicode-bidi:plaintext}.arrow{border:0;background:transparent;color:var(--blue);font-size:1.2em;font-weight:700;cursor:pointer;padding:0 .15em;border-radius:5px}.arrow:hover{background:#24313b}.exec-block{margin:1.25rem 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0d0b}.exec-header{display:flex;justify-content:space-between;align-items:center;padding:.55rem .8rem;color:var(--muted);background:#1a2018;border-bottom:1px solid var(--line);font:600 .78rem ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}.copy-code{border:1px solid #45513d;background:#252f20;color:var(--lime);padding:.35rem .65rem;border-radius:7px;cursor:pointer;font:inherit;text-transform:none;letter-spacing:0}.exec-block pre{margin:0;border:0;border-radius:0}
 ul.task-list{list-style:none;padding-left:1.25rem}.task-list-item{list-style:none;margin-left:-1.25rem}.task-list-item input[type=checkbox]{margin:0 .55rem .15rem 0;accent-color:var(--lime);vertical-align:middle}del{text-decoration:line-through;text-decoration-thickness:2px;color:#a2ad9b}ins{color:var(--lime);text-decoration:underline;text-decoration-style:dotted}abbr[title]{text-decoration:underline dotted;cursor:help}dl{margin:1rem 0}dt{font-weight:750;color:#e5efd9;margin-top:.8rem}dd{margin:.25rem 0 .75rem 1.5rem;color:var(--muted)}.footnote-ref,.footnote-backref{color:var(--lime);font-size:.8em}.footnote{border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem;font-size:.9em;color:var(--muted)}.admonition{margin:1.2rem 0;border:1px solid #46553a;border-left:4px solid var(--lime);border-radius:5px 16px 16px 5px;padding:.85rem 1.1rem;background:#c0f4770b}.admonition>.admonition-title{font-weight:750;color:var(--lime);margin-bottom:.45rem}.admonition.tip{border-left-color:#88d1ff;background:#88d1ff0b}.admonition.tip>.admonition-title{color:#88d1ff}.admonition.important{border-left-color:#b8a2ff;background:#b8a2ff0b}.admonition.important>.admonition-title{color:#b8a2ff}.admonition.warning,.admonition.caution{border-left-color:#ffb86b;background:#ffb86b0b}.admonition.warning>.admonition-title,.admonition.caution>.admonition-title{color:#ffb86b}details{border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;margin:1rem 0;background:#181d16}details>summary{cursor:pointer;color:var(--lime);font-weight:700}details[open]>summary{margin-bottom:.6rem}mark{background:#d7fb81;color:#17210e;border-radius:4px;padding:0 .2em}sup,sub{line-height:0}
+.exec-actions{display:flex;gap:7px;align-items:center}.run-code{border:1px solid #536a42;border-radius:7px;background:#253421;color:var(--lime);padding:.35rem .65rem;cursor:pointer;font:inherit;text-transform:none;letter-spacing:0}.exec-output:empty{display:none}.exec-output{border-top:1px solid var(--line);padding:0;background:#090b09}.exec-output iframe{display:block;width:100%;min-height:90px;border:0;background:#0b0d0b;color:#e9eee5}.mdxl-translation,.mdxl-joke-translation{margin:1.1rem 0;padding:1rem 1.1rem;border:1px solid #394632;border-left:4px solid var(--blue);border-radius:5px 14px 14px 5px;background:#88d1ff08}.mdxl-translation-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--blue);margin-bottom:.55rem}.translation-source{margin:.25rem 0 .75rem;border-left-color:#4b6654;font-size:.92em}.translate-action{padding:.45rem .8rem;border:1px solid #4c6040;border-radius:999px;background:#20291b;color:var(--lime);cursor:pointer;font:inherit;font-size:.82rem}.translate-action:disabled{opacity:.55;cursor:wait}.translation-output{margin-top:.75rem;white-space:pre-wrap;overflow-wrap:anywhere}.translation-output:empty{display:none}.translation-output[data-error="true"]{color:#ffb86b}.mdxl-joke-translation{border-left-color:#c9baff;background:#c9baff08}.mdxl-joke-translation .mdxl-translation-label{color:#c9baff}.mdxl-format{margin:1.6rem 0;padding:clamp(1.4rem,4vw,3rem);border:1px solid #424a3c;border-radius:6px;background:#f6f3eb;color:#282a25;font-family:Georgia,"Times New Roman",serif;line-height:1.85;box-shadow:0 16px 40px #0002}.mdxl-format-label{font:800 .62rem/1.4 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#5d6d4c;border-bottom:1px solid #dedbcf;padding-bottom:.6rem;margin-bottom:1.25rem}.mdxl-format-headers{margin-bottom:1.8rem}.mdxl-format-header{min-height:1.4em}.mdxl-format-header-1{font-weight:700}.mdxl-format-body p{margin:.7rem 0}.mdxl-format-body a{color:#354d70}.mdxl-format-apa .mdxl-format-headers{text-align:center}.mdxl-format-apa .mdxl-format-header-1{margin-bottom:.6rem}.mdxl-format-mla .mdxl-format-headers{text-align:left}.mdxl-format-mla .mdxl-format-header-1{font-weight:400}.mdxl-format-mla .mdxl-format-body h1,.mdxl-format-mla .mdxl-format-body h2{text-align:center;font-size:1.15em;font-weight:400}.mdxl-format-ieee .mdxl-format-header-1{color:#294e79}.mdxl-format-chicago .mdxl-format-header-1{text-align:center;margin-bottom:1rem}.mdxl-format-harvard .mdxl-format-header-1{font-style:italic}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 """
@@ -601,18 +602,35 @@ def render_mdxl(content, live=False):
     """Render MDXL, GitHub Flavored Markdown, and Markdown Extra safely."""
     code_blocks = []
     exec_blocks = []
+    translation_blocks = []
+    formatted_blocks = []
 
-    def process_exec(match):
-        lang = (match.group(1) or "text").strip() or "text"
-        rendered = ('<div class="exec-block"><div class="exec-header"><span>' + html.escape(lang)
-                    + '</span><button type="button" class="copy-code">Copy code</button></div><pre><code>'
-                    + html.escape(match.group(2)) + '</code></pre></div>')
+    def add_exec_block(lang, source):
+        language = (lang or "text").strip() or "text"
+        runnable = language.lower() in {"js", "javascript", "ecmascript"}
+        run_button = '<button type="button" class="run-code">Run JavaScript</button>' if runnable else ""
+        rendered = (
+            '<div class="exec-block"><div class="exec-header"><span>' + html.escape(language)
+            + '</span><div class="exec-actions"><button type="button" class="copy-code">Copy code</button>'
+            + run_button + '</div></div><pre><code>' + html.escape(source)
+            + '</code></pre><div class="exec-output" aria-live="polite"></div></div>'
+        )
         exec_blocks.append(rendered)
         return "\n\nMDXLEXECBLOCK" + str(len(exec_blocks) - 1) + "TOKEN\n\n"
 
+    def process_exec(match):
+        return add_exec_block(match.group(1), match.group(2))
+
     content = re.sub(
-        r"(?ms)^`{5}([a-zA-Z0-9_+-]*)[ \t]*\n(.*?)^`{5}[ \t]*$".replace("`", chr(96)),
+        r"(?ms)^\x60{5}([a-zA-Z0-9_+-]*)[ \t]*\n(.*?)^\x60{5}[ \t]*$",
         process_exec, content,
+    )
+
+    # JavaScript fences get an explicit Run button; code only executes after a click.
+    content = re.sub(
+        r"(?ms)^[ \t]*(\x60{3,4})(?:javascript|js)(?:[ \t]+(?:run|exec))?[ \t]*\n(.*?)^[ \t]*\1[ \t]*$",
+        lambda match: add_exec_block("javascript", match.group(2)),
+        content, flags=re.IGNORECASE,
     )
 
     def hold_fence(match):
@@ -620,11 +638,12 @@ def render_mdxl(content, live=False):
         return "\n\nMDXLRAWBLOCK" + str(len(code_blocks) - 1) + "TOKEN\n\n"
 
     content = re.sub(
-        r"(?ms)^[ \t]*(`{3,4}(?!`)|~{3,})[^\n]*\n.*?^[ \t]*\1[ \t]*$".replace("`", chr(96)),
+        r"(?ms)^[ \t]*(\x60{3,4}(?!\x60)|~{3,})[^\n]*\n.*?^[ \t]*\1[ \t]*$",
         hold_fence, content,
     )
     # Escape raw HTML only after protecting fenced code, so code remains readable.
     content = escape_source_html(content)
+    content = _render_translation_directives(content, translation_blocks)
     # Four tildes create MDXL's striped-through effect; code fences are protected above.
     content = re.sub(
         r"(?<!~)~~~~([^\n]+?)~~~~(?!~)",
@@ -675,13 +694,14 @@ def render_mdxl(content, live=False):
     }.items():
         content = content.replace(token, markup)
     content = re.sub(r":([a-z0-9_]+):", lambda match: EMOJI.get(match.group(0), match.group(0)), content)
-    # A leading double greater-than is a shorthand for a quote nested in a quote.
-    content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1> > \2", content)
     content = re.sub(r"^(-#)\s(.*)$", r'<h5 class="mdxl-micro-1">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(-##)\s(.*)$", r'<h5 class="mdxl-micro-2">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(-###)\s(.*)$", r'<h5 class="mdxl-micro-3">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(\+\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-2">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-1">\2</h5>', content, flags=re.MULTILINE)
+    content = _extract_formatted_documents(content, formatted_blocks)
+    # The formatted-document parser runs first so >>> headers are not mistaken for quotes.
+    content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1> > \2", content)
 
     content = expand_gfm_alerts(content)
     body = markdown.markdown(
@@ -713,16 +733,86 @@ def render_mdxl(content, live=False):
     for index, rendered in enumerate(exec_blocks):
         marker = "MDXLEXECBLOCK" + str(index) + "TOKEN"
         body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    for index, rendered in enumerate(formatted_blocks):
+        marker = "MDXLFORMATBLOCK" + str(index) + "TOKEN"
+        body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    for index, rendered in enumerate(translation_blocks):
+        marker = "MDXLTRANSLATIONBLOCK" + str(index) + "TOKEN"
+        body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
     body = sanitize_rendered_html(body)
 
     script = """
 <script>
+async function translateBox(box) {
+  const output = box.querySelector('.translation-output');
+  const button = box.querySelector('.translate-action');
+  if (!output || !button) return;
+  let target = box.dataset.target;
+  let label = box.dataset.label || target;
+  if (target === 'auto') {
+    const choices = [['ru','Russian'],['zh','Mandarin Chinese'],['yue','Cantonese'],['pl','Polish']];
+    const selected = choices[Math.floor(Math.random() * choices.length)];
+    target = selected[0]; label = selected[1];
+    box.dataset.target = target;
+    box.dataset.label = label;
+    box.querySelector('.mdxl-translation-label').textContent = 'Auto-translate · ' + label;
+  }
+  button.disabled = true;
+  button.textContent = 'Translating…';
+  output.dataset.error = 'false';
+  output.textContent = 'Translating to ' + label + '…';
+  try {
+    const response = await fetch('/__translate', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({text: box.querySelector('.translation-source').textContent, target})
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Translation request failed.');
+    let translated = data.translatedText;
+    const variant = box.dataset.variant;
+    const swaps = variant === 'sps'
+      ? [[/\bcomputadora\b/gi,'ordenador'],[/\bcelular\b/gi,'móvil'],[/\bcarro\b/gi,'coche'],[/\bplaticar\b/gi,'charlar']]
+      : variant === 'spm'
+        ? [[/\bordenador\b/gi,'computadora'],[/\bmóvil\b/gi,'celular'],[/\bcoche\b/gi,'carro'],[/\bcharlar\b/gi,'platicar']]
+        : [];
+    for (const [pattern,replacement] of swaps) translated = translated.replace(pattern, replacement);
+    output.textContent = translated;
+  } catch (error) {
+    output.dataset.error = 'true';
+    output.textContent = error.message + ' Configure MDXL_TRANSLATE_ENDPOINT for a supported LibreTranslate server.';
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Translate again';
+  }
+}
+function runJavaScript(block) {
+  const source = block.querySelector('code').textContent;
+  const output = block.querySelector('.exec-output');
+  output.replaceChildren();
+  const frame = document.createElement('iframe');
+  frame.setAttribute('sandbox', 'allow-scripts');
+  frame.setAttribute('referrerpolicy', 'no-referrer');
+  frame.title = 'Sandboxed JavaScript output';
+  const policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; form-action 'none'; base-uri 'none'";
+  const scriptClose = '<' + '/script>';
+  const safeCode = source.replace(new RegExp('<' + '/script', 'gi'), '<\\/' + 'script');
+  const bootstrap = "const out=document.getElementById('output');const format=v=>{if(typeof v==='string')return v;try{return JSON.stringify(v)}catch(e){return String(v)}};console.log=(...a)=>{out.textContent+=a.map(format).join(' ')+'\\n'};console.error=(...a)=>{out.textContent+='Error: '+a.map(format).join(' ')+'\\n'};window.onerror=(m)=>{out.textContent+='Error: '+m+'\\n'};";
+  frame.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="' + policy + '"><style>body{margin:0;padding:12px;background:#0b0d0b;color:#e9eee5;font:13px/1.6 ui-monospace,monospace}pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:#c0f477}</style></head><body><pre id="output"></pre><script>' + bootstrap + scriptClose + '<script>' + safeCode + '\n' + scriptClose + '</body></html>';
+  output.appendChild(frame);
+  window.setTimeout(() => {
+    if (frame.isConnected) frame.srcdoc = '<!doctype html><body style="color:#ffb86b;background:#0b0d0b;font:13px monospace;padding:12px">Execution stopped after 10 seconds.</body>';
+  }, 10000);
+}
 document.addEventListener('click', async (event) => {
   const arrow = event.target.closest('[data-arrow]');
   if (arrow) {
     const cycle = {right:['left','⬅'], left:['both','⇄'], both:['right','➜']};
     const next = cycle[arrow.dataset.arrow]; arrow.dataset.arrow = next[0]; arrow.textContent = next[1]; return;
   }
+  const translationButton = event.target.closest('.translate-action');
+  if (translationButton) { await translateBox(translationButton.closest('.mdxl-translation')); return; }
+  const runButton = event.target.closest('.run-code');
+  if (runButton) { runJavaScript(runButton.closest('.exec-block')); return; }
   const button = event.target.closest('.copy-code');
   if (button) {
     try { await navigator.clipboard.writeText(button.closest('.exec-block').querySelector('code').textContent);
@@ -730,6 +820,7 @@ document.addEventListener('click', async (event) => {
     } catch (_) { button.textContent = 'Select code to copy'; }
   }
 });
+document.querySelectorAll('.mdxl-translation[data-auto="true"]').forEach(box => translateBox(box));
 </script>
 """
     return ("<!doctype html><html lang='en'><head><meta charset='utf-8'>"
