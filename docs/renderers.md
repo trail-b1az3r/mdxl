@@ -14,7 +14,7 @@ Five-backtick blocks become copyable code blocks. Source code is not executed. R
 
 ## Terminal renderer
 
-The mdxl-cli command maps MDXL tokens to ANSI colors and Unicode. It also renders GFM checklist markers and double-tilde strikethrough. Markdown tables, footnotes, definitions, and links remain readable source text rather than becoming a fully typeset terminal document.
+The mdxl-cli command maps MDXL tokens to ANSI colors and Unicode. It renders GFM checklist markers and double-tilde strikethrough, formats aligned GFM tables as bordered terminal grids, and turns GFM alert blockquotes into color-labeled callouts. Footnotes, definitions, and links remain readable source text rather than becoming a fully typeset terminal document.
 
 ## Export and live preview
 
