@@ -1,41 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Markdown XL" version="1" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" author="AI + blazer" license="MIT">
+<language name="Markdown XL" version="2" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" author="AI" license="MIT">
     <highlighting>
+        <list name="mdxl_completions">
+            <item>-# </item>
+            <item>-## </item>
+            <item>-### </item>
+            <item>#### </item>
+            <item>`````python</item>
+            <item>`````bash</item>
+            <item>/!!!/</item>
+            <item>/col//</item>
+            <item>/col#</item>
+            <item>||||[</item>
+            <item>]||||</item>
+            <item>[[==>></item>
+            <item>[[<<==</item>
+            <item>[[<=>></item>
+            <item>>></item>
+        </list>
+
         <contexts>
             <context attribute="Normal Text" lineBeginContext="#stay" lineEndContext="#stay" name="Normal Text">
-                <!-- Micro Headers -->
-                <RegExpr attribute="Header" context="#stay" String="^(-#|-##|-###|####)\s.*$" column="0"/>
+                <!-- MDXL Micro Headers -->
+                <RegExpr attribute="MicroHeader" context="#stay" String="^(-#|-##|-###)\s.*$" column="0"/>
+                <RegExpr attribute="SubHeader" context="#stay" String="^####\s.*$" column="0"/>
+                
+                <!-- Standard Markdown Headers -->
+                <RegExpr attribute="Header" context="#stay" String="^#{1,6}\s.*$" column="0"/>
                 
                 <!-- Executable Code Blocks (5 backticks) -->
                 <RegExpr attribute="CodeBlock" context="CodeBlock" String="^`````.*$" beginRegion="Code"/>
                 
-                <!-- Upside Down Text -->
+                <!-- Standard Markdown Formatting -->
+                <Detect2Chars attribute="Bold" context="Bold" char="*" char1="*"/>
+                <DetectChar attribute="Italic" context="Italic" char="*"/>
+                <DetectChar attribute="CodeInline" context="CodeInline" char="`"/>
+                
+                <!-- MDXL Special Syntax -->
                 <StringDetect attribute="Special" context="UpsideDown" String="/!!!/"/>
-                
-                <!-- Quote a Quote -->
                 <StringDetect attribute="Blockquote" context="#stay" String=">>"/>
-                
-                <!-- Interactive Arrows -->
-                <StringDetect attribute="Arrow" context="#stay" String="[[==>>]]"/>
-                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;&lt;==]]"/>
-                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;=&gt;&gt;]]"/>
-                
-                <!-- Invisible Ink -->
+                <StringDetect attribute="Arrow" context="#stay" String="[[==>"/>
+                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;&lt;=="/>
+                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;=&gt;"/>
                 <RegExpr attribute="InvisibleInk" context="#stay" String="\|\|\|\|\[.*?\]\|\|\|\|"/>
-                
-                <!-- Colored Text -->
                 <StringDetect attribute="ColorStart" context="ColorText" String="/col//"/>
             </context>
             
-            <context attribute="CodeBlock" lineBeginContext="#stay" lineEndContext="#pop" name="CodeBlock">
+            <!-- Sub-contexts -->
+            <context attribute="Bold" lineBeginContext="#stay" lineEndContext="#stay" name="Bold">
+                <Detect2Chars attribute="Bold" context="#pop" char="*" char1="*"/>
+            </context>
+            <context attribute="Italic" lineBeginContext="#stay" lineEndContext="#stay" name="Italic">
+                <DetectChar attribute="Italic" context="#pop" char="*"/>
+            </context>
+            <context attribute="CodeInline" lineBeginContext="#stay" lineEndContext="#stay" name="CodeInline">
+                <DetectChar attribute="CodeInline" context="#pop" char="`"/>
+            </context>
+            <context attribute="CodeBlock" lineBeginContext="#stay" lineEndContext="#stay" name="CodeBlock">
                 <RegExpr attribute="CodeBlock" context="#pop" String="^``````*$" endRegion="Code"/>
             </context>
-            
             <context attribute="UpsideDown" lineBeginContext="#stay" lineEndContext="#stay" name="UpsideDown">
                 <StringDetect attribute="Special" context="#pop" String="/!!!/"/>
             </context>
-            
             <context attribute="ColorText" lineBeginContext="#stay" lineEndContext="#stay" name="ColorText">
                 <RegExpr attribute="ColorEnd" context="#pop" String="/col#[0-9a-fA-F]{6}//"/>
             </context>
@@ -44,14 +71,38 @@
         <itemDatas>
             <itemData name="Normal Text" defStyleNum="dsNormal"/>
             <itemData name="Header" defStyleNum="dsFunction" bold="1"/>
+            <itemData name="MicroHeader" defStyleNum="dsDataType" bold="1" color="#555555"/>
+            <itemData name="SubHeader" defStyleNum="dsDataType" bold="1" color="#777777"/>
+            <itemData name="Bold" defStyleNum="dsNormal" bold="1"/>
+            <itemData name="Italic" defStyleNum="dsNormal" italic="1"/>
+            <itemData name="CodeInline" defStyleNum="dsConstant" color="#d14"/>
             <itemData name="CodeBlock" defStyleNum="dsString"/>
-            <itemData name="Special" defStyleNum="dsKeyword"/>
+            <itemData name="Special" defStyleNum="dsKeyword" color="#e36209"/>
             <itemData name="Blockquote" defStyleNum="dsComment" italic="1"/>
-            <itemData name="Arrow" defStyleNum="dsDataType" bold="1"/>
-            <itemData name="InvisibleInk" defStyleNum="dsFloat"/>
-            <itemData name="ColorStart" defStyleNum="dsKeyword"/>
+            <itemData name="Arrow" defStyleNum="dsDataType" bold="1" color="#007bff"/>
+            <itemData name="InvisibleInk" defStyleNum="dsFloat" color="#ffffff" backgroundColor="#333333"/>
+            <itemData name="ColorStart" defStyleNum="dsKeyword" color="#d14"/>
             <itemData name="ColorText" defStyleNum="dsNormal"/>
-            <itemData name="ColorEnd" defStyleNum="dsKeyword"/>
+            <itemData name="ColorEnd" defStyleNum="dsKeyword" color="#d14"/>
         </itemDatas>
+        
+        <!-- Autocompletion Popup -->
+        <completion>
+            <item>-# </item>
+            <item>-## </item>
+            <item>-### </item>
+            <item>#### </item>
+            <item>`````python</item>
+            <item>`````bash</item>
+            <item>/!!!/</item>
+            <item>/col//</item>
+            <item>/col#</item>
+            <item>||||[</item>
+            <item>]||||</item>
+            <item>[[==>></item>
+            <item>[[<<==</item>
+            <item>[[<=>></item>
+            <item>>></item>
+        </completion>
     </highlighting>
 </language>

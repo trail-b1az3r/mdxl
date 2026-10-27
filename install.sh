@@ -16,6 +16,12 @@ cp mdxl_preview.py "$HOME/.local/bin/mdxl-preview"
 chmod +x "$HOME/.local/bin/mdxl-preview"
 echo "[✓] Installed preview tool to $HOME/.local/bin/mdxl-preview"
 
+# 2. Install Terminal CLI
+mkdir -p "$HOME/.local/bin"
+cp mdxl_cli.py "$HOME/.local/bin/mdxl-cli"
+chmod +x "$HOME/.local/bin/mdxl-cli"
+echo "[✓] Installed terminal renderer to $HOME/.local/bin/mdxl-cli"
+
 # 3. Install Python Dependencies
 echo "[ ] Installing Python 'markdown' package..."
 pip install markdown --user --quiet --break-system-packages
@@ -27,12 +33,9 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
 fi
-
 echo ""
 echo "======================================="
 echo "  Installation Complete!"
 echo "======================================="
-echo "1. Restart Kate to apply syntax highlighting."
-echo "2. Create a file 'test.mdxl'"
-echo "3. Run: mdxl-preview test.mdxl"
-echo "4. Open 'test.html' in your browser."
+echo "1. Restart Kate to apply native highlighting and autocomplete."
+echo "2. Run: mdxl-cli <file.mdxl> to view it in the terminal."
