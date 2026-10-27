@@ -33,6 +33,30 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertIn("[ ]", rendered)
         self.assertIn("\033[9moutdated", rendered)
 
+    def test_gfm_table_renders_as_aligned_terminal_grid(self):
+        source = "| Feature | Status |\n| :--- | ---: |\n| Tables | ready |\n| ~~Old approach~~ | replaced |"
+        rendered = render_terminal(source)
+        self.assertRegex(rendered, r"\+-{14}\+-{10}\+")
+        self.assertIn("| Feature", rendered)
+        self.assertIn("Status |", rendered)
+        self.assertNotIn("| :--- | ---: |", rendered)
+        self.assertIn("\033[9mOld approach\033[0m", rendered)
+
+    def test_flip_uses_terminal_friendly_digit_mappings(self):
+        rendered = render_terminal("/!!!/Hello MDXL 42 7/!!!/")
+        for unsupported in (chr(0x1105), chr(0x3134), chr(0x02e5), chr(0x3105)):
+            self.assertNotIn(unsupported, rendered)
+        self.assertIn("ollǝH", rendered)
+
+    def test_gfm_alerts_render_as_labeled_callouts(self):
+        source = "> [!TIP]\n> Use callouts for a tip.\n> Keep the second line."
+        rendered = render_terminal(source)
+        self.assertIn("TIP:", rendered)
+        self.assertIn("Use callouts for a tip.", rendered)
+        self.assertIn("    Keep the second line.", rendered)
+        self.assertNotIn("[!TIP]", rendered)
+        self.assertNotIn("> Use callouts", rendered)
+
     def test_arrows_and_shortcode(self):
         rendered = render_terminal("[[==>>]] [[<<==]] [[<=>>]] :check:")
         for symbol in ("➜", "⬅", "⇄", "✅"):
