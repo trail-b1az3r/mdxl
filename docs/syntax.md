@@ -203,7 +203,7 @@ Supported language shortcuts include `en` (English), `es` / `spanish` (Spanish),
 
 You can also request local, humorous writing styles: `joke1` / `pirate` (pirate-like English), `joke2` / `oldenglish` (archaic English styling, not a historically accurate Old English translation), `joke3` / `earlymodern` (formal early-modern-flavored English), `joke4` / `shakespeare` (Shakespearean-flavored English), `joke5` / `corporate` (corporate jargon), `joke6` / `noir` (noir detective voice), and `joke7` / `genz` (Gen Z slang). These are playful local word substitutions, not machine translations.
 
-**Privacy:** adding `//autoT//` is an instruction to send that marked text to your translation endpoint when the preview opens. The default MDXL endpoint is a community-hosted LibreTranslate instance. For a self-hosted endpoint or a managed endpoint that requires an API key, set the variables before launching the preview:
+**Privacy:** adding `//autoT//` is an instruction to send that marked text to your translation endpoint when the preview opens or the terminal renderer processes the file. The default MDXL endpoint is a community-hosted LibreTranslate instance. For a self-hosted endpoint or a managed endpoint that requires an API key, set the variables before launching the preview:
 
 ```bash
 export MDXL_TRANSLATE_ENDPOINT="http://127.0.0.1:5000/translate"
