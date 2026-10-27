@@ -16,7 +16,7 @@
 - Three micro-header levels (`-#`, `-##`, `-###`) plus the `####` subheading.
 - Terminal rendering with mdxl-cli and browser rendering with mdxl-preview.
 - Kate syntax highlighting and completion suggestions.
-- JavaScript code fences have an explicit Run JavaScript button and execute only after a click inside a sandboxed iframe; other languages remain copy-only. Marked `//autoT//...//target` text is automatically translated in the preview through the configured translation service. APA/MLA-style document blocks can provide up to four optional headers.
+- JavaScript code fences have an explicit Run JavaScript button and execute only after a click inside a sandboxed iframe; other languages remain copy-only. Marked `//autoT//...//target` text is translated by the preview or terminal renderer through the configured translation service. APA/MLA-style document blocks can provide up to four optional headers.
 
 ## Install
 
