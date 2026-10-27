@@ -42,6 +42,7 @@ def _flip(match):
 def render_terminal(content):
     """Render supported MDXL tokens in a plain-text document."""
     fenced = []
+    mdxl_code_blocks = []
 
     def hold_fence(match):
         fenced.append(match.group(0))
@@ -51,10 +52,14 @@ def render_terminal(content):
         r"(?ms)^[ \t]*((?:`{3,4}(?!`)|~{3,}))[^\n]*\n.*?^[ \t]*\1[ \t]*$".replace("`", chr(96)),
         hold_fence, content,
     )
-    # Five-backtick MDXL blocks receive terminal emphasis and are never executed.
+    # Keep five-backtick code literal until the rest of the renderer has finished.
+    def hold_mdxl_code(match):
+        mdxl_code_blocks.append(match.group(0))
+        return f"MDXLTERMINALMDXLBLOCK{len(mdxl_code_blocks) - 1}TOKEN"
+
     content = re.sub(
         r"(?ms)^`{5}([a-zA-Z0-9_+-]*)[ \t]*\n(.*?)^`{5}[ \t]*$".replace("`", chr(96)),
-        lambda match: f"\033[33m{match.group(0)}{RESET}", content,
+        hold_mdxl_code, content,
     )
 
     def color(match):
@@ -74,11 +79,25 @@ def render_terminal(content):
     content = content.replace("[[<<==]]", "\033[1;34m⬅\033[0m")
     content = content.replace("[[<=>>]]", "\033[1;34m⇄\033[0m")
     content = re.sub(r":([a-z0-9_]+):", lambda m: EMOJI.get(m.group(0), m.group(0)), content)
+    # Plain terminal equivalents for common GFM inline and checklist syntax.
+    content = re.sub(
+        r"(?m)^(\s*(?:[-+*]|\d+[.)])\s+)\[([ xX])\]\s+",
+        lambda m: m.group(1) + (f"\033[92m[x]{RESET}" if m.group(2).strip() else "[ ]") + " ",
+        content,
+    )
+    content = re.sub(
+        r"(?<!~)~~(.+?)~~(?!~)",
+        lambda m: f"\033[9m{m.group(1)}{RESET}",
+        content,
+        flags=re.DOTALL,
+    )
     content = re.sub(r"^-###\s(.*)$", rf"\033[2m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^-##\s(.*)$", rf"\033[2;1m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^-#\s(.*)$", rf"\033[1;4m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^####\s(.*)$", rf"\033[1;96m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^(#{1,6})\s(.*)$", rf"\033[1;97m\2{RESET}", content, flags=re.MULTILINE)
+    for index, block in enumerate(mdxl_code_blocks):
+        content = content.replace(f"MDXLTERMINALMDXLBLOCK{index}TOKEN", f"\033[33m{block}{RESET}")
     for index, block in enumerate(fenced):
         content = content.replace(f"MDXLTERMINALFENCE{index}TOKEN", block)
     return content

@@ -17,6 +17,7 @@ export default defineConfig({
         main: resolve(root, "index.html"),
         guide: resolve(root, "guide/index.html"),
         syntax: resolve(root, "syntax/index.html"),
+        markdown: resolve(root, "markdown/index.html"),
         installation: resolve(root, "installation/index.html"),
         renderers: resolve(root, "renderers/index.html"),
         examples: resolve(root, "examples/index.html"),

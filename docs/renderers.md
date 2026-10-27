@@ -1,26 +1,32 @@
-# Renderers and editor support
-
-## Terminal renderer
-
-`mdxl-cli <document.mdxl>` turns recognized tokens into ANSI colors and Unicode glyphs. It has no third-party dependencies and never executes code.
+# Renderers and Markdown compatibility
 
 ## Browser preview
 
-`mdxl-preview <document.mdxl>` serves a local preview on `127.0.0.1` and refreshes on save. Available options include `--port`, `--no-open`, `--stdout`, and `--export`.
+The mdxl-preview command renders MDXL plus extended Markdown in a local browser. Supported syntax includes:
 
-Export a static copy:
+- Core Markdown blocks, links, emphasis, lists, quotes, fenced code blocks, and tables.
+- GFM task lists, strikethrough, bare URL/email autolinks, aligned tables, and GitHub-style alert callouts.
+- Markdown Extra-style footnotes, definition lists, abbreviations, custom heading IDs, and attribute lists.
+- Inline highlight, superscript, inserted text, and collapsible details.
+- MDXL color, rainbow, keycap, progress, invisible-ink, arrow, shortcode, and heading tokens.
+
+Five-backtick blocks become copyable code blocks. Source code is not executed. Raw HTML tags are escaped, and the rendered fragment is sanitized; unsafe attributes and URL schemes are removed.
+
+## Terminal renderer
+
+The mdxl-cli command maps MDXL tokens to ANSI colors and Unicode. It also renders GFM checklist markers and double-tilde strikethrough. Markdown tables, footnotes, definitions, and links remain readable source text rather than becoming a fully typeset terminal document.
+
+## Export and live preview
+
+mdxl-preview serves the file on 127.0.0.1 and refreshes when it changes. Export standalone HTML with:
 
 ```bash
 mdxl-preview demo.mdxl --export
 mdxl-preview demo.mdxl --export ./demo.html
 ```
 
-Five-backtick code blocks become copyable blocks; they are not executed. Source HTML tags are escaped to prevent them becoming active markup in the preview.
+Useful options include --port, --no-open, --stdout, and --live. The server binds to loopback only.
 
 ## Kate syntax
 
-mdxl.xml declares the .mdxl extension, token highlighting, and completions for MDXL syntax. Run the installer and restart Kate to activate it.
-
-## Documentation site
-
-The website is a Vite + React app built with HeroUI. Actions tests the Python renderer, builds the static site, and deploys it to GitHub Pages when changes reach main. Site source lives in website/.
+mdxl.xml declares the .mdxl extension, token highlighting, and completions. Kate uses the syntax definition, not the browser parser, so richer Markdown features may not receive the same in-editor rendering.

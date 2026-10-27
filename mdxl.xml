@@ -9,6 +9,20 @@
         <RegExpr attribute="MicroHeader3" context="#stay" String="^-###\s.*$" column="0"/>
         <RegExpr attribute="SubHeader" context="#stay" String="^####\s.*$" column="0"/>
         <RegExpr attribute="Header" context="#stay" String="^#{1,6}\s.*$" column="0"/>
+        <RegExpr attribute="AlertMarker" context="#stay" String="^&gt;\s+\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\].*$" column="0"/>
+        <RegExpr attribute="TaskList" context="#stay" String="^\s*([-+*]|\d+[.)])\s+\[[ xX]\].*$" column="0"/>
+        <RegExpr attribute="FootnoteDefinition" context="#stay" String="^\[\^[^]]+\]:.*$" column="0"/>
+        <RegExpr attribute="Abbreviation" context="#stay" String="^\*\[[^]]+\]:.*$" column="0"/>
+        <RegExpr attribute="Details" context="#stay" String="^\?\?\?\+?\s+.*$" column="0"/>
+        <RegExpr attribute="DefinitionList" context="#stay" String="^:\s+.*$" column="0"/>
+        <RegExpr attribute="TableDelimiter" context="#stay" String="^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$" column="0"/>
+        <RegExpr attribute="HeadingAttributes" context="#stay" String="\{#[A-Za-z0-9_-]+(?:\s+\.?[A-Za-z0-9_-]+)*\}"/>
+        <RegExpr attribute="Footnote" context="#stay" String="\[\^[^]]+\]"/>
+        <RegExpr attribute="Inserted" context="#stay" String="\^\^[^^]+\^\^"/>
+        <RegExpr attribute="Superscript" context="#stay" String="\^[^^]+\^"/>
+        <RegExpr attribute="Mark" context="#stay" String="==[^=]+=="/>
+        <RegExpr attribute="Strikethrough" context="#stay" String="~~[^~]+~~"/>
+        <RegExpr attribute="AutoLink" context="#stay" String="https?://[^\s&lt;&gt;]+"/>
         <RegExpr attribute="CodeBlock" context="CodeBlock" String="^`{5}.*$" beginRegion="Code"/>
         <Detect2Chars attribute="Bold" context="Bold" char="*" char1="*"/>
         <DetectChar attribute="Italic" context="Italic" char="*"/>
@@ -41,6 +55,20 @@
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
       <itemData name="Header" defStyleNum="dsFunction" bold="1"/>
+      <itemData name="TaskList" defStyleNum="dsDataType" bold="1" color="#8bd86b"/>
+      <itemData name="Strikethrough" defStyleNum="dsNormal" strikeOut="1" color="#969f8f"/>
+      <itemData name="Mark" defStyleNum="dsNormal" backgroundColor="#d7fb81" color="#17210e" bold="1"/>
+      <itemData name="Superscript" defStyleNum="dsDecVal" color="#88d1ff"/>
+      <itemData name="Inserted" defStyleNum="dsNormal" underline="1" color="#c0f477"/>
+      <itemData name="Footnote" defStyleNum="dsDecVal" color="#b8a2ff"/>
+      <itemData name="FootnoteDefinition" defStyleNum="dsComment" color="#b8a2ff"/>
+      <itemData name="Abbreviation" defStyleNum="dsKeyword" color="#88d1ff"/>
+      <itemData name="Details" defStyleNum="dsKeyword" color="#c0f477" bold="1"/>
+      <itemData name="DefinitionList" defStyleNum="dsComment" italic="1"/>
+      <itemData name="TableDelimiter" defStyleNum="dsComment" color="#829078"/>
+      <itemData name="HeadingAttributes" defStyleNum="dsAnnotation" color="#b8a2ff"/>
+      <itemData name="AlertMarker" defStyleNum="dsKeyword" color="#ffb86b" bold="1"/>
+      <itemData name="AutoLink" defStyleNum="dsString" color="#88d1ff" underline="1"/>
       <itemData name="MicroHeader1" defStyleNum="dsDataType" bold="1" color="#555555"/>
       <itemData name="MicroHeader2" defStyleNum="dsDataType" bold="1" color="#777777"/>
       <itemData name="MicroHeader3" defStyleNum="dsDataType" bold="1" color="#999999"/>
@@ -68,6 +96,10 @@
     </itemDatas>
     <completion>
       <item>-# </item><item>-## </item><item>-### </item><item>#### </item>
+      <item>- [ ] </item><item>- [x] </item><item>[^note]: </item><item>*[HTML]: </item>
+      <item>&gt; [!NOTE]</item><item>&gt; [!TIP]</item><item>&gt; [!WARNING]</item>
+      <item>## Heading {#id}</item><item>??? note "Details"</item><item>==highlight==</item><item>~~strikethrough~~</item>
+      <item>| Header | Header |</item><item>| --- | ---: |</item>
       <item>`````python</item><item>`````bash</item>
       <item>/!!!/</item><item>/col//</item><item>/col#</item><item>||||[</item><item>]||||</item>
       <item>[[==&gt;&gt;]]</item><item>[[&lt;&lt;==]]</item><item>[[&lt;=&gt;&gt;]]</item><item>&gt;&gt; </item>

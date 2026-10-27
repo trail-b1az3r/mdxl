@@ -20,6 +20,19 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertIn("100%", render_terminal("/bar//999//"))
         self.assertIn("0%", render_terminal("/bar//0//"))
 
+    def test_five_backtick_code_keeps_markdown_tokens_literal(self):
+        source = "`````python\nprint('~~not strike~~ /rbw//not rainbow//rbw//')\n`````"
+        rendered = render_terminal(source)
+        self.assertIn("~~not strike~~", rendered)
+        self.assertIn("/rbw//not rainbow//rbw//", rendered)
+        self.assertIn("\033[33m", rendered)
+
+    def test_gfm_task_markers_and_strikethrough(self):
+        rendered = render_terminal("- [x] shipped\n- [ ] next\n~~outdated~~")
+        self.assertIn("[x]", rendered)
+        self.assertIn("[ ]", rendered)
+        self.assertIn("\033[9moutdated", rendered)
+
     def test_arrows_and_shortcode(self):
         rendered = render_terminal("[[==>>]] [[<<==]] [[<=>>]] :check:")
         for symbol in ("➜", "⬅", "⇄", "✅"):
