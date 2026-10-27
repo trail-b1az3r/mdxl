@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "@heroui/react";
+import { BASE, docPages, DocumentationPage, SiteNav, SiteFooter } from "./docs.jsx";
 import "./styles.css";
 
 const samples = [
@@ -157,6 +158,7 @@ function HomePage() {
 
       <section className="safety-note"><div className="wrap safety-inner"><div><span className="kicker">A NOTE ON CODE BLOCKS</span><h2>Show the code.<br/><em>Don't surprise the reader.</em></h2></div><p>Five-backtick MDXL blocks are presented as copyable code in the browser preview. They do not run automatically. Execution belongs to an explicit user action outside the renderer.</p></div></section>
     <section className="section wrap more-reading"><div className="section-title"><div><span className="kicker">GO A LITTLE DEEPER</span><h2>There's more<br/><em>in the docs.</em></h2></div><p>A growing guide to the syntax, tools, examples, and practical ways to use MDXL.</p></div><div className="reading-grid">{docPages.map((p,i)=><a className={"reading-card reading-"+i} key={p.id} href={BASE+p.id+"/"}><span>{String(i+1).padStart(2,"0")} / {p.kicker}</span><h3>{p.label}</h3><p>{p.intro}</p><b>Explore page ↗</b></a>)}</div></section>
+  <section className="section wrap more-reading"><div className="section-title"><div><span className="kicker">GO A LITTLE DEEPER</span><h2>There's more<br/><em>in the docs.</em></h2></div><p>A growing guide to the syntax, tools, examples, and practical ways to use MDXL.</p></div><div className="reading-grid">{docPages.map((p,i)=><a className={"reading-card reading-"+i} key={p.id} href={BASE+p.id+"/"}><span>{String(i+1).padStart(2,"0")} / {p.kicker}</span><h3>{p.label}</h3><p>{p.intro}</p><b>Explore page ↗</b></a>)}</div></section>
   </main>
     <SiteFooter/>
     {notice && <div className="toast" role="status">{notice}</div>}
