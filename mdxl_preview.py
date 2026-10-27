@@ -771,9 +771,9 @@ async function translateBox(box) {
     let translated = data.translatedText;
     const variant = box.dataset.variant;
     const swaps = variant === 'sps'
-      ? [[/\bcomputadora\b/gi,'ordenador'],[/\bcelular\b/gi,'móvil'],[/\bcarro\b/gi,'coche'],[/\bplaticar\b/gi,'charlar']]
+      ? [[/\\\\bcomputadora\\\\b/gi,'ordenador'],[/\\\\bcelular\\\\b/gi,'móvil'],[/\\\\bcarro\\\\b/gi,'coche'],[/\\\\bplaticar\\\\b/gi,'charlar']]
       : variant === 'spm'
-        ? [[/\bordenador\b/gi,'computadora'],[/\bmóvil\b/gi,'celular'],[/\bcoche\b/gi,'carro'],[/\bcharlar\b/gi,'platicar']]
+        ? [[/\\\\bordenador\\\\b/gi,'computadora'],[/\\\\bmóvil\\\\b/gi,'celular'],[/\\\\bcoche\\\\b/gi,'carro'],[/\\\\bcharlar\\\\b/gi,'platicar']]
         : [];
     for (const [pattern,replacement] of swaps) translated = translated.replace(pattern, replacement);
     output.textContent = translated;
