@@ -175,6 +175,60 @@ Example disclosure:
 
 MDXL's own highlight token //hl//text//hl// remains available too.
 
+## Executable code fences
+
+JavaScript fences in the browser preview include a Run JavaScript button. Code runs only after you press the button, inside a sandboxed iframe with network access blocked. Five-backtick blocks still provide a prominent copyable-code presentation; when tagged as JavaScript, they also provide the Run button. Other languages are displayed as source and are not executed.
+
+```js
+console.log("Hello from MDXL");
+```
+
+The terminal renderer does not execute source code. When exporting HTML, the execution button works in the page itself; translated blocks require the local preview server.
+
+## Automatic translation directives
+
+Use `//autoT//text to translate//target` to mark the exact text to translate. The source language is detected automatically by the configured translation service.
+
+```md
+//autoT//Hola, ¿cómo estás?//en
+//autoT//Hello there//sps
+//autoT//Hello there//spm
+//autoT//Hello there//ru
+//autoT//Hello there//mandarin
+//autoT//Hello there//cantonese
+//autoT//Hello there//pl
+```
+
+Supported language shortcuts include `en` (English), `es` / `spanish` (Spanish), `sps` (Spanish with Spain-oriented vocabulary), `spm` (Spanish with Mexico-oriented vocabulary), `fr` (French), `de` (German), `it` (Italian), `pt` (Portuguese), `ru` (Russian), `zh` / `mandarin` (Mandarin Chinese), `yue` / `cantonese` (Cantonese), `pl` (Polish), `ja` (Japanese), `ko` (Korean), `ar` (Arabic), `hi` (Hindi), and `nl` (Dutch). `auto` randomly chooses Russian, Mandarin Chinese, Cantonese, or Polish. A translation service needs a model for the requested language; unavailable models will show an error.
+
+You can also request local, humorous writing styles: `joke1` / `pirate` (pirate-like English), `joke2` / `oldenglish` (archaic English styling, not a historically accurate Old English translation), `joke3` / `earlymodern` (formal early-modern-flavored English), `joke4` / `shakespeare` (Shakespearean-flavored English), `joke5` / `corporate` (corporate jargon), `joke6` / `noir` (noir detective voice), and `joke7` / `genz` (Gen Z slang). These are playful local word substitutions, not machine translations.
+
+**Privacy:** adding `//autoT//` is an instruction to send that marked text to your translation endpoint when the preview opens. The default MDXL endpoint is a community-hosted LibreTranslate instance. For a self-hosted endpoint or a managed endpoint that requires an API key, set the variables before launching the preview:
+
+```bash
+export MDXL_TRANSLATE_ENDPOINT="http://127.0.0.1:5000/translate"
+export MDXL_TRANSLATE_API_KEY="your-key-if-required"
+mdxl-preview demo.mdxl
+```
+
+Never put an API key inside the `.mdxl` document.
+
+## Formatted document blocks
+
+Start a formatted document with `>>>[FORMAT]` and up to four optional parenthesized header fields. The body begins after the header line and continues until another formatted-block header or end-of-file. Format names include APA, APA7, MLA, MLA9, Chicago, IEEE, Harvard, Turabian, AMA, and generic.
+
+```md
+>>>[APA](Research Title)(Author Name)(Course)(Date)
+The opening paragraph starts here. Continue writing the APA-styled document with ordinary Markdown.
+
+A second paragraph is included in the same formatted block.
+
+>>>[MLA](Student Name)(Instructor)(Course)(Date)
+The MLA-styled document starts here. The header fields are optional; leave any field out when you do not need it.
+```
+
+The browser preview styles each format with a different paper-like layout. This is a presentation helper, not a complete citation manager or a guarantee of fully compliant academic formatting.
+
 ## MDXL inline tokens
 
 | Source | Effect |
