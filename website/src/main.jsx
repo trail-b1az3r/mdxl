@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "@heroui/react";
-import { BASE, docPages, DocumentationPage, SiteNav, SiteFooter } from "./docs.jsx";
 import "./styles.css";
 
 const samples = [
