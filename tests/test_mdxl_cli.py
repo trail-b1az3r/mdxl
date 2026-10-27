@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 from mdxl_cli import render_terminal
 
@@ -26,6 +27,25 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertIn("~~not strike~~", rendered)
         self.assertIn("/rbw//not rainbow//rbw//", rendered)
         self.assertIn("\033[33m", rendered)
+
+    def test_auto_translation_joke_styles_are_local(self):
+        rendered = render_terminal("//autoT//Hello friend//joke1")
+        self.assertIn("Pirate English", rendered)
+        self.assertIn("Arrr! Ahoy matey", rendered)
+
+    def test_auto_translation_uses_the_provider_for_language_codes(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+            def __exit__(self, *_args):
+                return False
+            def read(self, _limit):
+                return b'{"translatedText":"Hola, mundo."}'
+
+        with mock.patch("mdxl_cli.urllib.request.urlopen", return_value=FakeResponse()):
+            rendered = render_terminal("//autoT//Hello world//sps")
+        self.assertIn("Spanish (Spain)", rendered)
+        self.assertIn("Hola, mundo.", rendered)
 
     def test_gfm_task_markers_and_strikethrough(self):
         rendered = render_terminal("- [x] shipped\n- [ ] next\n~~outdated~~")

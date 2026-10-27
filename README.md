@@ -16,7 +16,7 @@
 - Three micro-header levels (`-#`, `-##`, `-###`) plus the `####` subheading.
 - Terminal rendering with mdxl-cli and browser rendering with mdxl-preview.
 - Kate syntax highlighting and completion suggestions.
-- Five-backtick code blocks are copyable in the preview. Code is never executed automatically.
+- JavaScript code fences have an explicit Run JavaScript button and execute only after a click inside a sandboxed iframe; other languages remain copy-only. Marked `//autoT//...//target` text is translated by the preview or terminal renderer through the configured translation service. APA/MLA-style document blocks can provide up to four optional headers.
 
 ## Install
 
@@ -50,6 +50,9 @@ MDXL builds on [GitHub Flavored Markdown](https://github.github.com/gfm/) and [M
 | `+# Heading`, `++# Heading` | Two additional compact heading levels |
 | `>> Nested quote` | Quote inside another quotation |
 | `~~~~Striped-through~~~~` | Striped strike-band effect |
+| `js` code fence | Click-to-run JavaScript in a sandboxed preview |
+| `//autoT//Hola//en` | Translate marked text into English |
+| `>>>[APA](Title)(Author)(Course)(Date)` | Format a document block with optional headers |
 | `#### Subheading` | Markdown level-four heading |
 | `/col//Signal /col#B7F77A//` | Hex true color |
 | `/rbw//Spectrum//rbw//` | Rainbow text |

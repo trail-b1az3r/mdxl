@@ -38,6 +38,7 @@ class KateAndMimeTests(unittest.TestCase):
         }
         expected = {
             "MicroHeader1", "MicroHeader2", "MicroHeader3", "AlertMarker",            "PlusHeader1", "PlusHeader2", "DoubleBlockquote", "StripedThrough",
+            "AutoTranslate", "FormatHeader",
             "TaskList", "FootnoteDefinition", "Abbreviation", "Details",
             "DefinitionList", "TableDelimiter", "HeadingAttributes", "Footnote",
             "Inserted", "Superscript", "Mark", "Strikethrough", "AutoLink",

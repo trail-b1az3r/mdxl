@@ -57,7 +57,7 @@
 
 .gfm-strike-demo del{font-size:12px;color:#8f9b87;text-decoration-thickness:2px}
 .gfm-strike-demo b{font-size:17px;font-weight:650;color:var(--lime)}
-.gfm-footnote-demo>span{font-size:17px;font-weight:600;color:#e5eddf}
+.mdxl-exec-demo,.mdxl-translation-demo,.mdxl-format-demo{display:flex;flex-direction:column;gap:9px;padding:13px;border:1px solid #38442e;border-radius:10px;background:#0f130d;color:#dce7d4;font-size:11px}.mdxl-exec-demo>b{font:800 9px ui-monospace,monospace;color:var(--lime)}.mdxl-exec-demo>span{align-self:flex-start;padding:5px 9px;border:1px solid #536a42;border-radius:999px;color:var(--lime)}.mdxl-exec-demo code{color:#c9baff}.mdxl-translation-demo small,.mdxl-format-demo small{font-size:8px;letter-spacing:.12em;color:#88d1ff}.mdxl-translation-demo>span{color:#9ee37d}.mdxl-format-demo{background:#f6f3eb;color:#282a25;font-family:Georgia,serif}.mdxl-format-demo small{color:#5d6d4c}.mdxl-format-demo>span,.mdxl-format-demo p{font-size:9px;color:#666b60;margin:0}
 .gfm-footnote-demo sup{font-size:10px;color:var(--lime);margin-left:2px}
 .gfm-footnote-demo small{font-size:10px;color:#9da994;border-top:1px solid #343e2d;padding-top:8px;max-width:240px}
 .gfm-footnote-demo small b{color:var(--md-primary);padding-right:5px}

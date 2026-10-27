@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """MDXL terminal renderer — ANSI colors and Unicode, with no HTML dependency."""
 import argparse
+import json
+import os
+import random
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 RESET = "\033[0m"
@@ -198,6 +204,126 @@ def _render_gfm_alerts(content):
     return rendered + ("\n" if trailing_newline else "")
 
 
+
+
+TRANSLATION_TARGETS = {
+    "en": ("en","English"), "english": ("en","English"),
+    "es": ("es","Spanish"), "spanish": ("es","Spanish"), "sp": ("es","Spanish"),
+    "sps": ("es","Spanish (Spain)"), "spm": ("es","Spanish (Mexico)"), "spansh": ("es","Spanish"),
+    "fr": ("fr","French"), "french": ("fr","French"),
+    "de": ("de","German"), "german": ("de","German"),
+    "it": ("it","Italian"), "italian": ("it","Italian"),
+    "pt": ("pt","Portuguese"), "portuguese": ("pt","Portuguese"),
+    "ru": ("ru","Russian"), "russian": ("ru","Russian"),
+    "zh": ("zh","Mandarin Chinese"), "mandarin": ("zh","Mandarin Chinese"), "chinese": ("zh","Mandarin Chinese"),
+    "yue": ("yue","Cantonese"), "cantonese": ("yue","Cantonese"),
+    "pl": ("pl","Polish"), "polish": ("pl","Polish"),
+    "ja": ("ja","Japanese"), "japanese": ("ja","Japanese"),
+    "ko": ("ko","Korean"), "korean": ("ko","Korean"),
+    "ar": ("ar","Arabic"), "arabic": ("ar","Arabic"),
+    "hi": ("hi","Hindi"), "hindi": ("hi","Hindi"),
+    "nl": ("nl","Dutch"), "dutch": ("nl","Dutch"),
+    "auto": ("auto","Random language"),
+}
+JOKE_NAMES = {
+    "joke1":"Pirate English","pirate":"Pirate English",
+    "joke2":"Archaic English style","oldenglish":"Archaic English style",
+    "joke3":"Early Modern English style","earlymodern":"Early Modern English style",
+    "joke4":"Shakespearean English style","shakespeare":"Shakespearean English style",
+    "joke5":"Corporate jargon","corporate":"Corporate jargon",
+    "joke6":"Noir detective style","noir":"Noir detective style",
+    "joke7":"Gen Z slang","genz":"Gen Z slang",
+}
+TRANSLATION_RE = re.compile(
+    r"//autoT//(.*?)//(" + "|".join(map(re.escape, sorted((*TRANSLATION_TARGETS, *JOKE_NAMES), key=len, reverse=True))) + r")(?![A-Za-z0-9_-])",
+    re.IGNORECASE | re.DOTALL,
+)
+TRANSLATE_ENDPOINT = "https://translate.argosopentech.com/translate"
+
+
+def _joke_translation(text, alias):
+    styles = {
+        "joke1":{"hello":"ahoy","hi":"ahoy","friend":"matey","friends":"mateys","you":"ye","your":"yer","are":"be","is":"be","the":"th'","and":"an'","money":"booty","yes":"aye","no":"nay","very":"mighty","good":"fine"},
+        "pirate":{"hello":"ahoy","hi":"ahoy","friend":"matey","friends":"mateys","you":"ye","your":"yer","are":"be","is":"be","the":"th'","and":"an'","money":"booty","yes":"aye","no":"nay","very":"mighty","good":"fine"},
+        "joke2":{"you":"thou","your":"thy","yours":"thine","are":"art","do":"dost","does":"doth","have":"hast","has":"hath","before":"ere","hello":"good morrow","yes":"verily","no":"nay","please":"prithee","because":"forsooth"},
+        "oldenglish":{"you":"thou","your":"thy","yours":"thine","are":"art","do":"dost","does":"doth","have":"hast","has":"hath","before":"ere","hello":"good morrow","yes":"verily","no":"nay","please":"prithee","because":"forsooth"},
+        "joke3":{"hello":"good day","hi":"good day","very":"exceedingly","get":"obtain","start":"commence","end":"conclude","help":"assist","use":"utilize","about":"concerning","buy":"purchase","show":"display","ask":"inquire","before":"prior to"},
+        "earlymodern":{"hello":"good day","hi":"good day","very":"exceedingly","get":"obtain","start":"commence","end":"conclude","help":"assist","use":"utilize","about":"concerning","buy":"purchase","show":"display","ask":"inquire","before":"prior to"},
+        "joke4":{"hello":"good morrow","hi":"hail","you":"thou","your":"thy","are":"art","yes":"aye","no":"nay","friend":"noble soul","because":"forsooth"},
+        "shakespeare":{"hello":"good morrow","hi":"hail","you":"thou","your":"thy","are":"art","yes":"aye","no":"nay","friend":"noble soul","because":"forsooth"},
+        "joke5":{"use":"leverage","help":"provide enablement for","start":"align on","finish":"drive to completion","problem":"opportunity","idea":"strategic initiative","change":"pivot","meeting":"sync","plan":"roadmap","ask":"action item"},
+        "corporate":{"use":"leverage","help":"provide enablement for","start":"align on","finish":"drive to completion","problem":"opportunity","idea":"strategic initiative","change":"pivot","meeting":"sync","plan":"roadmap","ask":"action item"},
+        "joke6":{"hello":"listen, pal","friend":"client","problem":"case","money":"dough","police":"the law","night":"the mean streets","good":"on the level","bad":"dirty"},
+        "noir":{"hello":"listen, pal","friend":"client","problem":"case","money":"dough","police":"the law","night":"the mean streets","good":"on the level","bad":"dirty"},
+        "joke7":{"very":"low-key","good":"fire","great":"goated","bad":"mid","friend":"bestie","friends":"besties","amazing":"iconic","really":"literally","cool":"chill","no":"nah","yes":"yeah"},
+        "genz":{"very":"low-key","good":"fire","great":"goated","bad":"mid","friend":"bestie","friends":"besties","amazing":"iconic","really":"literally","cool":"chill","no":"nah","yes":"yeah"},
+    }
+    replacements = styles.get(alias, {})
+    pattern = re.compile(r"\b(" + "|".join(map(re.escape, sorted(replacements, key=len, reverse=True))) + r")\b", re.IGNORECASE) if replacements else None
+    if pattern:
+        def replace(match):
+            value = replacements[match.group(0).lower()]
+            return value.upper() if match.group(0).isupper() else value.title() if match.group(0).istitle() else value
+        text = pattern.sub(replace, text)
+    prefixes = {
+        "joke1":"Arrr! ","pirate":"Arrr! ","joke2":"Verily, ","oldenglish":"Verily, ",
+        "joke3":"In formal terms, ","earlymodern":"In formal terms, ","joke4":"Hark! ","shakespeare":"Hark! ",
+        "joke5":"For strategic alignment: ","corporate":"For strategic alignment: ",
+        "joke6":"It was a dark night. ","noir":"It was a dark night. ","joke7":"No cap: ","genz":"No cap: ",
+    }
+    return prefixes.get(alias, "") + text
+
+
+def _online_translation(text, target, variant=""):
+    code, label = TRANSLATION_TARGETS[target]
+    if code == "auto":
+        code, label = random.choice([("ru","Russian"),("zh","Mandarin Chinese"),("yue","Cantonese"),("pl","Polish")])
+    if len(text) > 4000:
+        raise ValueError("translation blocks are limited to 4,000 characters")
+    endpoint = os.environ.get("MDXL_TRANSLATE_ENDPOINT", TRANSLATE_ENDPOINT).strip()
+    parsed = urllib.parse.urlsplit(endpoint)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("MDXL_TRANSLATE_ENDPOINT must be an HTTP or HTTPS URL")
+    payload = {"q": text, "source": "auto", "target": code, "format": "text"}
+    api_key = os.environ.get("MDXL_TRANSLATE_API_KEY", "").strip()
+    if api_key:
+        payload["api_key"] = api_key
+    request = urllib.request.Request(endpoint, data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type":"application/json","Accept":"application/json"},method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            data = json.loads(response.read(1_000_000).decode("utf-8"))
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, json.JSONDecodeError) as error:
+        raise RuntimeError("translation service unavailable") from error
+    translated = data.get("translatedText") if isinstance(data, dict) else None
+    if not isinstance(translated, str) or not translated.strip():
+        raise RuntimeError("translation service returned no text")
+    if variant == "sps":
+        translated = re.sub(r"\bcomputadora\b","ordenador",translated,flags=re.IGNORECASE)
+        translated = re.sub(r"\bcelular\b","móvil",translated,flags=re.IGNORECASE)
+        translated = re.sub(r"\bcarro\b","coche",translated,flags=re.IGNORECASE)
+    elif variant == "spm":
+        translated = re.sub(r"\bordenador\b","computadora",translated,flags=re.IGNORECASE)
+        translated = re.sub(r"\bmóvil\b","celular",translated,flags=re.IGNORECASE)
+        translated = re.sub(r"\bcoche\b","carro",translated,flags=re.IGNORECASE)
+    return label, translated
+
+
+def _render_translations(content):
+    def replace(match):
+        source = match.group(1).strip()
+        alias = match.group(2).lower()
+        if alias in JOKE_NAMES:
+            text = _joke_translation(source, alias)
+            return f"\033[1;35m[{JOKE_NAMES[alias]}]\033[0m {text}"
+        try:
+            label, text = _online_translation(source, alias, alias if alias in {"sps","spm"} else "")
+            return f"\033[1;36m[{label}]\033[0m {text}"
+        except (ValueError, RuntimeError) as error:
+            return f"\033[33m[translation unavailable: {error}]\033[0m {source}"
+    return TRANSLATION_RE.sub(replace, content)
+
+
 def render_terminal(content):
     """Render supported MDXL tokens in a plain-text document."""
     fenced = []
@@ -238,6 +364,7 @@ def render_terminal(content):
     content = content.replace("[[<<==]]", "\033[1;34m⬅\033[0m")
     content = content.replace("[[<=>>]]", "\033[1;34m⇄\033[0m")
     content = re.sub(r":([a-z0-9_]+):", lambda m: EMOJI.get(m.group(0), m.group(0)), content)
+    content = _render_translations(content)
     # Plain terminal equivalents for common GFM inline and checklist syntax.
     content = re.sub(
         r"(?m)^(\s*(?:[-+*]|\d+[.)])\s+)\[([ xX])\]\s+",

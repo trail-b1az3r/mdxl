@@ -30,6 +30,8 @@
         <!-- Extended inline syntax. -->
         <RegExpr attribute="HeadingAttributes" String="\{(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?)(?:\s+(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?))*\}"/>
         <RegExpr attribute="Footnote" String="\[\^[^]]+\]"/>
+        <RegExpr attribute="AutoTranslate" String="//autoT//.*//(en|english|es|spanish|sp|sps|spm|spansh|fr|french|de|german|it|italian|pt|portuguese|ru|russian|zh|chinese|mandarin|yue|cantonese|pl|polish|ja|japanese|ko|korean|ar|arabic|hi|hindi|nl|dutch|auto|joke[1-7]|pirate|oldenglish|earlymodern|shakespeare|corporate|noir|genz)$" minimal="true" insensitive="true"/>
+        <RegExpr attribute="FormatHeader" String="^&gt;&gt;&gt;\[[A-Za-z][A-Za-z0-9_-]*\](\([^)]*\)){0,4}" column="0" insensitive="true"/>
         <RegExpr attribute="Inserted" String="\^\^[^^]+\^\^" minimal="true"/>
         <RegExpr attribute="Superscript" String="\^[^^]+\^" minimal="true"/>
         <RegExpr attribute="Mark" String="==[^=]+==" minimal="true"/>
@@ -114,6 +116,8 @@
       <itemData name="TableDelimiter" defStyleNum="dsComment" color="#829078"/>
       <itemData name="HeadingAttributes" defStyleNum="dsAnnotation" color="#b8a2ff"/>
       <itemData name="Footnote" defStyleNum="dsDecVal" color="#b8a2ff"/>
+      <itemData name="AutoTranslate" defStyleNum="dsKeyword" bold="1" color="#88d1ff"/>
+      <itemData name="FormatHeader" defStyleNum="dsKeyword" bold="1" color="#c9baff"/>
       <itemData name="Strikethrough" defStyleNum="dsNormal" strikeOut="1" color="#969f8f"/>
       <itemData name="StripedThrough" defStyleNum="dsNormal" strikeOut="1" underline="1" color="#f08ab5"/>
       <itemData name="Mark" defStyleNum="dsNormal" backgroundColor="#d7fb81" color="#17210e" bold="1"/>
@@ -146,6 +150,8 @@
       <item># Heading</item><item>## Heading</item><item>### Heading</item><item>#### Heading</item>
       <item>- [ ] </item><item>- [x] </item><item>1. [ ] </item>
       <item>[^note]: </item><item>*[HTML]: </item>
+      <item>//autoT//Hello world//en</item><item>//autoT//Hola mundo//sps</item><item>//autoT//Ahoy friend//joke1</item>
+      <item>&gt;&gt;&gt;[APA](Title)(Author)(Course)(Date)</item><item>&gt;&gt;&gt;[MLA](Name)(Instructor)(Course)(Date)</item>
       <item>&gt; [!NOTE]</item><item>&gt; [!TIP]</item><item>&gt; [!IMPORTANT]</item><item>&gt; [!WARNING]</item><item>&gt; [!CAUTION]</item>
       <item>## Heading {#id}</item><item>??? note "Details"</item>
       <item>==highlight==</item><item>~~strikethrough~~</item><item>~~~~striped-through~~~~</item><item>&gt; quoted text</item><item>&gt;&gt; nested quoted text</item><item>^superscript^</item><item>^^inserted^^</item>

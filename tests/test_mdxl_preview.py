@@ -1,7 +1,7 @@
 import html
 import unittest
 
-from mdxl_preview import render_mdxl
+from mdxl_preview import _translate_with_provider, render_mdxl
 
 
 class BrowserRendererTests(unittest.TestCase):
@@ -40,6 +40,47 @@ This is ~~~~striped-through text~~~~."""
         self.assertIn("/rbw//literal//rbw//", rendered)
         self.assertNotIn('class="mdxl-rainbow"', rendered)
         self.assertNotIn("runCode", rendered)
+
+    def test_executable_javascript_fence_requires_a_run_button(self):
+        source = chr(96) * 3 + "js\nconsole.log('hello from MDXL');\n" + chr(96) * 3
+        rendered = render_mdxl(source)
+        self.assertIn('class="exec-block"', rendered)
+        self.assertIn('class="run-code">Run JavaScript</button>', rendered)
+        self.assertIn('class="copy-code">Copy code</button>', rendered)
+        self.assertIn("sandbox", rendered)
+        self.assertIn("Execution stopped after 10 seconds.", rendered)
+
+    def test_auto_translation_directive_and_joke_styles(self):
+        translated = render_mdxl("//autoT//Hola, mundo.//en")
+        self.assertIn('class="mdxl-translation"', translated)
+        self.assertIn('data-target="en"', translated)
+        self.assertIn("Hola, mundo.", translated)
+        self.assertIn("fetch('/__translate'", translated)
+        self.assertIn(r"/\bcomputadora\b/gi", translated)
+        self.assertNotIn(chr(8), translated)
+
+        pirate = render_mdxl("//autoT//Hello friend//joke1")
+        self.assertIn('class="mdxl-joke-translation"', pirate)
+        self.assertIn("Pirate English", pirate)
+        self.assertIn("Arrr! Ahoy matey", pirate)
+
+    def test_translation_rejects_invalid_target_codes(self):
+        with self.assertRaises(ValueError):
+            _translate_with_provider("Hello", ["en"])
+        with self.assertRaises(ValueError):
+            _translate_with_provider("Hello", "not-a-language")
+
+    def test_formatted_document_blocks_apa_mla_and_optional_headers(self):
+        apa = render_mdxl(">>>[APA](Research Title)(Author Name)(Course)(Date)\nThis is the **formatted body**.")
+        self.assertIn('class="mdxl-format mdxl-format-apa"', apa)
+        self.assertIn("Research Title", apa)
+        self.assertIn("Author Name", apa)
+        self.assertIn("This is the <strong>formatted body</strong>.", apa)
+
+        mla = render_mdxl(">>>[MLA](Student Name)(Instructor)\nA short paper.")
+        self.assertIn('class="mdxl-format mdxl-format-mla"', mla)
+        self.assertIn("Student Name", mla)
+        self.assertIn("A short paper.", mla)
 
     def test_gfm_tables_tasks_strikethrough_and_autolinks(self):
         source = """| Feature | Support |
