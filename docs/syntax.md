@@ -184,4 +184,5 @@ Raw HTML is escaped, and rendered Markdown is sanitized. Unsafe attributes and U
 
 - mdxl-preview supports the GFM and Markdown Extra-style features listed here.
 - mdxl-cli styles MDXL tokens and provides terminal equivalents for GFM task markers and double-tilde strikethrough. Tables, footnotes, definitions, and other structural Markdown remain readable as plain source in the terminal.
-- Kate uses mdxl.xml for MDXL highlighting and completions; it is not a full Markdown parser.
+- Kate uses `mdxl.xml` for MDXL highlighting and completions and imports Kate's built-in Markdown grammar for standard Markdown syntax, supported GFM features, and fenced-code language highlighting.
+- The editor highlights source syntax; it does not render the browser preview's visual effects. The installer also registers `*.mdxl` as `text/x-mdxl` so Linux can identify it as a Markdown Extended Logic document.
