@@ -12,8 +12,10 @@ from pathlib import Path
 
 try:
     import markdown
+    import bleach
+    from bleach.css_sanitizer import CSSSanitizer
 except ImportError:
-    sys.exit("The preview requires Python Markdown. Install requirements-preview.txt or run ./install.sh.")
+    sys.exit("The preview requires Markdown, PyMdown Extensions, and Bleach. Install requirements-preview.txt or run ./install.sh.")
 
 UPSIDE_DOWN = str.maketrans({
     "a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ","k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ","u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z",
@@ -80,16 +82,50 @@ def expand_gfm_alerts(content):
 
     return re.sub(r"(?m)(?:^>[^\n]*(?:\n|$))+", convert, content)
 
+
+def sanitize_rendered_html(fragment):
+    """Allow Markdown output while stripping unsafe elements, attributes, and URL schemes."""
+    allowed_tags = set(bleach.sanitizer.ALLOWED_TAGS) | {
+        "h1", "h2", "h3", "h4", "h5", "h6", "p", "div", "span", "section",
+        "article", "blockquote", "hr", "br", "pre", "code", "del", "ins",
+        "mark", "kbd", "sup", "sub", "ul", "ol", "li", "input", "table",
+        "thead", "tbody", "tr", "th", "td", "dl", "dt", "dd", "abbr",
+        "details", "summary", "label", "button",
+    }
+    safe_names = {
+        "class", "id", "title", "href", "src", "alt", "width", "height",
+        "colspan", "rowspan", "align", "start", "type", "checked", "disabled",
+        "rel", "open", "role", "tabindex", "scope", "for", "data-arrow",
+    }
+
+    def allow_attribute(tag, name, value):
+        if name in safe_names or name.startswith(("aria-", "data-")):
+            return True
+        if name == "style":
+            return tag in {"span", "p", "h1", "h2", "h3", "h4", "h5", "h6", "th", "td"}
+        return False
+
+    cleaner = bleach.Cleaner(
+        tags=allowed_tags,
+        attributes=allow_attribute,
+        protocols={"http", "https", "mailto", "ftp"},
+        strip=True,
+        css_sanitizer=CSSSanitizer(allowed_css_properties=["color", "width", "text-align", "background-color"]),
+    )
+    return cleaner.clean(fragment)
+
 def render_mdxl(content, live=False):
-    """Render MDXL syntax and Markdown into a self-contained HTML document."""
-    content = escape_source_html(content)
+    """Render MDXL, GitHub Flavored Markdown, and Markdown Extra safely."""
     code_blocks = []
+    exec_blocks = []
 
     def process_exec(match):
         lang = (match.group(1) or "text").strip() or "text"
-        return ('<div class="exec-block"><div class="exec-header"><span>' + html.escape(lang)
-                + '</span><button type="button" class="copy-code">Copy code</button></div><pre><code>'
-                + html.escape(match.group(2)) + '</code></pre></div>')
+        rendered = ('<div class="exec-block"><div class="exec-header"><span>' + html.escape(lang)
+                    + '</span><button type="button" class="copy-code">Copy code</button></div><pre><code>'
+                    + html.escape(match.group(2)) + '</code></pre></div>')
+        exec_blocks.append(rendered)
+        return "\n\nMDXLEXECBLOCK" + str(len(exec_blocks) - 1) + "TOKEN\n\n"
 
     content = re.sub(
         r"(?ms)^`{5}([a-zA-Z0-9_+-]*)[ \t]*\n(.*?)^`{5}[ \t]*$".replace("`", chr(96)),
@@ -104,6 +140,8 @@ def render_mdxl(content, live=False):
         r"(?ms)^[ \t]*(`{3,4}(?!`)|~{3,})[^\n]*\n.*?^[ \t]*\1[ \t]*$".replace("`", chr(96)),
         hold_fence, content,
     )
+    # Escape raw HTML only after protecting fenced code, so code remains readable.
+    content = escape_source_html(content)
 
     def colored(match):
         return '<span class="mdxl-color" style="color:#' + match.group(2) + '">' + html.escape(match.group(1)) + "</span>"
@@ -177,8 +215,12 @@ def render_mdxl(content, live=False):
     )
     for index, block in enumerate(code_blocks):
         marker = "MDXLRAWBLOCK" + str(index) + "TOKEN"
-        rendered = markdown.markdown(block, extensions=["fenced_code"])
+        rendered = markdown.markdown(block, extensions=["extra", "sane_lists"])
         body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    for index, rendered in enumerate(exec_blocks):
+        marker = "MDXLEXECBLOCK" + str(index) + "TOKEN"
+        body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    body = sanitize_rendered_html(body)
 
     script = """
 <script>
