@@ -29,4 +29,4 @@ Useful options include --port, --no-open, --stdout, and --live. The server binds
 
 ## Kate syntax
 
-mdxl.xml declares the .mdxl extension, token highlighting, and completions. Kate uses the syntax definition, not the browser parser, so richer Markdown features may not receive the same in-editor rendering.
+The `mdxl.xml` definition is named **Markdown Extended Logic**, registers `*.mdxl` as `text/x-mdxl`, and adds highlighting and completions for MDXL-specific tokens and Extended Markdown markers. It imports Kate's bundled Markdown grammar for standard Markdown and GFM syntax, including headings, lists, inline emphasis, links and images, tables, block quotes, horizontal rules, fenced code blocks, and language-specific code highlighting where the bundled grammar supports it. Kate provides syntax highlighting, not the browser's rendered visual effects; for example, it highlights `/rbw//text//rbw//` as MDXL syntax instead of displaying each letter in rainbow colors.
