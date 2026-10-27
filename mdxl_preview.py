@@ -854,6 +854,28 @@ class MDXLHandler(BaseHTTPRequestHandler):
         else:
             self._send(404, "text/plain; charset=utf-8", b"Not found")
 
+    def do_POST(self):
+        if self.path != "/__translate":
+            self._send(404, "application/json; charset=utf-8", b'{"error":"Not found."}')
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 32_000:
+                raise ValueError("Request size is invalid.")
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("Expected a JSON object.")
+            translated = _translate_with_provider(payload.get("text"), payload.get("target"))
+        except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            response = {"error": str(error)}
+            self._send(400, "application/json; charset=utf-8", json.dumps(response).encode("utf-8"))
+            return
+        except RuntimeError as error:
+            response = {"error": str(error)}
+            self._send(502, "application/json; charset=utf-8", json.dumps(response).encode("utf-8"))
+            return
+        self._send(200, "application/json; charset=utf-8", json.dumps({"translatedText": translated}).encode("utf-8"))
+
     def log_message(self, *_args):
         return
 
