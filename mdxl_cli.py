@@ -1,80 +1,148 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
-<language name="Markdown XL" version="3" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" author="AI" license="MIT">
-    <highlighting>
-        <list name="mdxl_completions">
-            <item>-# </item> <item>-## </item> <item>-### </item> <item>#### </item>
-            <item>`````python</item> <item>`````bash</item>
-            <item>/!!!/</item> <item>/col//</item> <item>/col#</item>
-            <item>||||[</item> <item>]||||</item>
-            <item>[[==>>]]</item> <item>[[<<==]]</item> <item>[[<=>>]]</item> <item>>> </item>
-        </list>
+#!/usr/bin/env python3
+"""MDXL Pure Terminal Renderer v2 — ANSI + Unicode only. Zero HTML."""
+import re, sys
 
-        <contexts>
-            <context attribute="Normal Text" lineBeginContext="#stay" lineEndContext="#stay" name="Normal Text">
-                <!-- Micro Headers -->
-                <RegExpr attribute="MicroHeader1" context="#stay" String="^-#\s.*$" column="0"/>
-                <RegExpr attribute="MicroHeader2" context="#stay" String="^-##\s.*$" column="0"/>
-                <RegExpr attribute="MicroHeader3" context="#stay" String="^-###\s.*$" column="0"/>
-                <RegExpr attribute="SubHeader" context="#stay" String="^####\s.*$" column="0"/>
-                <RegExpr attribute="Header" context="#stay" String="^#{1,6}\s.*$" column="0"/>
-                
-                <!-- Executable Code Blocks -->
-                <RegExpr attribute="CodeBlock" context="CodeBlock" String="^`````.*$" beginRegion="Code"/>
-                
-                <!-- Standard Markdown -->
-                <Detect2Chars attribute="Bold" context="Bold" char="*" char1="*"/>
-                <DetectChar attribute="Italic" context="Italic" char="*"/>
-                <DetectChar attribute="CodeInline" context="CodeInline" char="`"/>
-                
-                <!-- MDXL Specials -->
-                <StringDetect attribute="Special" context="UpsideDown" String="/!!!/"/>
-                <StringDetect attribute="Blockquote" context="#stay" String=">>"/>
-                <StringDetect attribute="Arrow" context="#stay" String="[[==>"/>
-                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;&lt;=="/>
-                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;=&gt;"/>
-                
-                <!-- Native Invisible Ink (Black text on Black background) -->
-                <RegExpr attribute="InvisibleInk" context="#stay" String="\|\|\|\|\[.*?\]\|\|\|\|"/>
-                
-                <!-- Colors -->
-                <StringDetect attribute="ColorTag" context="ColorText" String="/col//"/>
-            </context>
-            
-            <context attribute="Bold" lineBeginContext="#stay" lineEndContext="#stay" name="Bold"><Detect2Chars attribute="Bold" context="#pop" char="*" char1="*"/></context>
-            <context attribute="Italic" lineBeginContext="#stay" lineEndContext="#stay" name="Italic"><DetectChar attribute="Italic" context="#pop" char="*"/></context>
-            <context attribute="CodeInline" lineBeginContext="#stay" lineEndContext="#stay" name="CodeInline"><DetectChar attribute="CodeInline" context="#pop" char="`"/></context>
-            <context attribute="CodeBlock" lineBeginContext="#stay" lineEndContext="#stay" name="CodeBlock"><RegExpr attribute="CodeBlock" context="#pop" String="^``````*$" endRegion="Code"/></context>
-            <context attribute="UpsideDown" lineBeginContext="#stay" lineEndContext="#stay" name="UpsideDown"><StringDetect attribute="Special" context="#pop" String="/!!!/"/></context>
-            <context attribute="ColorText" lineBeginContext="#stay" lineEndContext="#stay" name="ColorText"><RegExpr attribute="ColorTag" context="#pop" String="/col#[0-9a-fA-F]{6}//"/></context>
-        </contexts>
+RESET = "\033[0m"
+
+UPSIDE_DOWN = str.maketrans({
+    'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ','j':'ɾ','k':'ʞ','l':'l','m':'ɯ','n':'u','o':'o','p':'d','q':'b','r':'ɹ','s':'s','t':'ʇ','u':'n','v':'ʌ','w':'ʍ','x':'x','y':'ʎ','z':'z',
+    'A':'∀','B':'ᙠ','C':'Ɔ','D':'ᗡ','E':'Ǝ','F':'Ⅎ','G':'⅁','H':'H','I':'I','J':'ſ','K':'ʞ','L':'˥','M':'W','N':'N','O':'O','P':'Ԁ','Q':'Ꝺ','R':'ɹ','S':'S','T':'┴','U':'∩','V':'Λ','W':'M','X':'X','Y':'⅄','Z':'Z',
+    '0':'0','1':'Ɩ','2':'ᄅ','3':'Ɛ','4':'ㄣ','5':'ϛ','6':'9','7':'ㄥ','8':'8','9':'6',
+    '.':'˙', ',':'\'', '!':'¡', '?':'¿', '\'':',', '"':'„', '`':',', '&':'⅋',
+    '[':']', ']':'[', '(':')', ')':'(', '{':'}', '}':'{', '<':'>', '>':'<', '*':'⁎', '_':'‾',
+})
+
+EMOJI = {
+    ':fire:':'🔥', ':check:':'✅', ':x:':'❌', ':warn:':'⚠️', ':skull:':'💀',
+    ':heart:':'❤️', ':star:':'⭐', ':rocket:':'🚀', ':eyes:':'👀', ':think:':'🤔',
+    ':party:':'🎉', ':bug:':'🐛', ':lock:':'🔒', ':bulb:':'💡', ':coffee:':'☕',
+}
+
+RAINBOW = [(255,0,0),(255,127,0),(255,200,0),(0,180,0),(0,120,255),(120,0,255),(210,0,180)]
+
+def _rainbow(m):
+    return "".join(f"\033[38;2;{RAINBOW[i % 7][0]};{RAINBOW[i % 7][1]};{RAINBOW[i % 7][2]}m{ch}{RESET}"
+                   for i, ch in enumerate(m.group(1)))
+
+def _bar(m):
+    pct = max(0, min(100, int(m.group(1))))
+    filled = pct // 10
+    return f"\033[92m{'█'*filled}\033[90m{'░'*(10-filled)}{RESET} {pct}%"
+
+def render_terminal(content):
+    # Executable code blocks -> yellow
+    content = re.sub(r'^`````([a-zA-Z]+)?\n(.*?)^`````', lambda m: f"\033[33m{m.group(0)}{RESET}", content, flags=re.MULTILINE|re.DOTALL)
+    # /col// text /col#RRGGBB// -> ANSI TrueColor
+    def _col(m):
+        h = m.group(2)
+        r, g, b = int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
+        return f"\033[38;2;{r};{g};{b}m{m.group(1)}{RESET}"
+    content = re.sub(r'/col//(.*?)/col#([0-9a-fA-F]{6})//', _col, content, flags=re.DOTALL)
+    # NEW: rainbow
+    content = re.sub(r'/rbw//(.*?)/rbw//', _rainbow, content, flags=re.DOTALL)
+    # NEW: highlighter
+    content = re.sub(r'//hl//(.*?)//hl//', lambda m: f"\033[43;30m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    # NEW: redacted strikethrough
+    content = re.sub(r'/red//(.*?)/red//', lambda m: f"\033[9m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    # NEW: keycaps
+    content = re.sub(r'//key//(.*?)//key//', lambda m: f"\033[7m {m.group(1)} {RESET}", content, flags=re.DOTALL)
+    # NEW: progress bars
+    content = re.sub(r'/bar//([0-9]{1,3})//', _bar, content)
+    # Upside down
+    def _flip(m):
+        lines = m.group(1).split('\n')
+        return '\n'.join(l.translate(UPSIDE_DOWN)[::-1] for l in lines)[::-1]
+    content = re.sub(r'/!!!/(.*?)/!!!/', _flip, content, flags=re.DOTALL)
+    # Invisible ink (black on black)
+    content = re.sub(r'\|\|\|\|\[(.*?)\]\|\|\|\|', lambda m: f"\033[30;40m{m.group(1)}{RESET}", content)
+    # Arrows
+    content = content.replace('[[==>>]]', '\033[1;34m➜\033[0m')
+    content = content.replace('[[<<==]]', '\033[1;34m⬅\033[0m')
+    content = content.replace('[[<=>>]]', '\033[1;34m⇄\033[0m')
+    # NEW: emoji shortcodes
+    content = re.sub(r':([a-z0-9_]+):', lambda m: EMOJI.get(m.group(0), m.group(0)), content)
+    # Micro headers + standard headers
+    content = re.sub(r'^-###\s(.*)$', rf'\033[2m\1{RESET}', content, flags=re.MULTILINE)
+    content = re.sub(r'^-##\s(.*)$',  rf'\033[2;1m\1{RESET}', content, flags=re.MULTILINE)
+    content = re.sub(r'^-#\s(.*)$',   rf'\033[1;4m\1{RESET}', content, flags=re.MULTILINE)
+    content = re.sub(r'^(#{1,6})\s(.*)$', rf'\033[1;97m\2{RESET}', content, flags=re.MULTILINE)
+    return content
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: mdxl-cli <file.mdxl>")
+        sys.exit(1)
+    with open(sys.argv[1], 'r', encoding='utf-8') as f:
+        print(render_terminal(f.read()))#!/usr/bin/env python3
+        """MDXL Pure Terminal Renderer v2 — ANSI + Unicode only. Zero HTML."""
+        import re, sys
         
-        <itemDatas>
-            <itemData name="Normal Text" defStyleNum="dsNormal"/>
-            <itemData name="Header" defStyleNum="dsFunction" bold="1"/>
-            <itemData name="MicroHeader1" defStyleNum="dsDataType" bold="1" color="#555555"/>
-            <itemData name="MicroHeader2" defStyleNum="dsDataType" bold="1" color="#777777"/>
-            <itemData name="MicroHeader3" defStyleNum="dsDataType" bold="1" color="#999999"/>
-            <itemData name="SubHeader" defStyleNum="dsDataType" bold="1" color="#444444"/>
-            <itemData name="Bold" defStyleNum="dsNormal" bold="1"/>
-            <itemData name="Italic" defStyleNum="dsNormal" italic="1"/>
-            <itemData name="CodeInline" defStyleNum="dsConstant" color="#d14"/>
-            <itemData name="CodeBlock" defStyleNum="dsString"/>
-            <itemData name="Special" defStyleNum="dsKeyword" color="#e36209"/>
-            <itemData name="Blockquote" defStyleNum="dsComment" italic="1"/>
-            <itemData name="Arrow" defStyleNum="dsDataType" bold="1" color="#007bff"/>
-            <!-- Native Invisible Ink: foreground matches background -->
-            <itemData name="InvisibleInk" defStyleNum="dsNormal" color="#333333" backgroundColor="#333333"/>
-            <itemData name="ColorTag" defStyleNum="dsKeyword" color="#ff0000" bold="1"/>
-            <itemData name="ColorText" defStyleNum="dsNormal" color="#ff00ff"/>
-        </itemDatas>
+        RESET = "\033[0m"
         
-        <completion>
-            <item>-# </item> <item>-## </item> <item>-### </item> <item>#### </item>
-            <item>`````python</item> <item>`````bash</item>
-            <item>/!!!/</item> <item>/col//</item> <item>/col#</item>
-            <item>||||[</item> <item>]||||</item>
-            <item>[[==>>]]</item> <item>[[<<==]]</item> <item>[[<=>>]]</item> <item>>> </item>
-        </completion>
-    </highlighting>
-</language>
+        UPSIDE_DOWN = str.maketrans(
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?\'"`&[](){}<>*_',
+            'ɐqɔpǝɟƃɥᴉɾʞlɯuodbɹsʇnʌʍxʎz∀qƆpƎℲפHIſʞWNOԀbɹS┴∩ΛMXZ0ƖƐㄣϛ9ㄥ86˙\'¡¿,,„⅋][)(}{><⁎‾'
+        )
+        
+        EMOJI = {
+            ':fire:':'🔥', ':check:':'✅', ':x:':'❌', ':warn:':'⚠️', ':skull:':'💀',
+            ':heart:':'❤️', ':star:':'⭐', ':rocket:':'🚀', ':eyes:':'👀', ':think:':'🤔',
+            ':party:':'🎉', ':bug:':'🐛', ':lock:':'🔒', ':bulb:':'💡', ':coffee:':'☕',
+        }
+        
+        RAINBOW = [(255,0,0),(255,127,0),(255,200,0),(0,180,0),(0,120,255),(120,0,255),(210,0,180)]
+        
+        def _rainbow(m):
+            return "".join(f"\033[38;2;{RAINBOW[i % 7][0]};{RAINBOW[i % 7][1]};{RAINBOW[i % 7][2]}m{ch}{RESET}"
+                           for i, ch in enumerate(m.group(1)))
+        
+        def _bar(m):
+            pct = max(0, min(100, int(m.group(1))))
+            filled = pct // 10
+            return f"\033[92m{'█'*filled}\033[90m{'░'*(10-filled)}{RESET} {pct}%"
+        
+        def render_terminal(content):
+            # Executable code blocks -> yellow
+            content = re.sub(r'^`````([a-zA-Z]+)?\n(.*?)^`````', lambda m: f"\033[33m{m.group(0)}{RESET}", content, flags=re.MULTILINE|re.DOTALL)
+            # /col// text /col#RRGGBB// -> ANSI TrueColor
+            def _col(m):
+                h = m.group(2)
+                r, g, b = int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
+                return f"\033[38;2;{r};{g};{b}m{m.group(1)}{RESET}"
+            content = re.sub(r'/col//(.*?)/col#([0-9a-fA-F]{6})//', _col, content, flags=re.DOTALL)
+            # NEW: rainbow
+            content = re.sub(r'/rbw//(.*?)/rbw//', _rainbow, content, flags=re.DOTALL)
+            # NEW: highlighter
+            content = re.sub(r'//hl//(.*?)//hl//', lambda m: f"\033[43;30m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+            # NEW: redacted strikethrough
+            content = re.sub(r'/red//(.*?)/red//', lambda m: f"\033[9m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+            # NEW: keycaps
+            content = re.sub(r'//key//(.*?)//key//', lambda m: f"\033[7m {m.group(1)} {RESET}", content, flags=re.DOTALL)
+            # NEW: progress bars
+            content = re.sub(r'/bar//([0-9]{1,3})//', _bar, content)
+            # Upside down
+            def _flip(m):
+                lines = m.group(1).split('\n')
+                return '\n'.join(l.translate(UPSIDE_DOWN)[::-1] for l in lines)[::-1]
+            content = re.sub(r'/!!!/(.*?)/!!!/', _flip, content, flags=re.DOTALL)
+            # Invisible ink (black on black)
+            content = re.sub(r'\|\|\|\|\[(.*?)\]\|\|\|\|', lambda m: f"\033[30;40m{m.group(1)}{RESET}", content)
+            # Arrows
+            content = content.replace('[[==>>]]', '\033[1;34m➜\033[0m')
+            content = content.replace('[[<<==]]', '\033[1;34m⬅\033[0m')
+            content = content.replace('[[<=>>]]', '\033[1;34m⇄\033[0m')
+            # NEW: emoji shortcodes
+            content = re.sub(r':([a-z0-9_]+):', lambda m: EMOJI.get(m.group(0), m.group(0)), content)
+            # Micro headers + standard headers
+            content = re.sub(r'^-###\s(.*)$', rf'\033[2m\1{RESET}', content, flags=re.MULTILINE)
+            content = re.sub(r'^-##\s(.*)$',  rf'\033[2;1m\1{RESET}', content, flags=re.MULTILINE)
+            content = re.sub(r'^-#\s(.*)$',   rf'\033[1;4m\1{RESET}', content, flags=re.MULTILINE)
+            content = re.sub(r'^(#{1,6})\s(.*)$', rf'\033[1;97m\2{RESET}', content, flags=re.MULTILINE)
+            return content
+        
+        if __name__ == "__main__":
+            if len(sys.argv) < 2:
+                print("Usage: mdxl-cli <file.mdxl>")
+                sys.exit(1)
+            with open(sys.argv[1], 'r', encoding='utf-8') as f:
+                print(render_terminal(f.read()))
