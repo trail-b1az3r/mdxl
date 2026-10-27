@@ -1,0 +1,72 @@
+name: Test and deploy MDXL docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mdxl-pages
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    name: Python renderer tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install preview dependency
+        run: python -m pip install -r requirements-preview.txt
+      - name: Compile renderers and syntax definition
+        run: |
+          python -m py_compile mdxl_cli.py mdxl_preview.py
+          python -c "import xml.etree.ElementTree as ET; ET.parse('mdxl.xml')"
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+  build-site:
+    name: Build Vite documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        working-directory: website
+        run: npm install
+      - name: Build
+        working-directory: website
+        run: npm run build
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+
+  deploy:
+    name: Deploy GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [python-tests, build-site]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
