@@ -793,7 +793,7 @@ function runJavaScript(block) {
   frame.setAttribute('sandbox', 'allow-scripts');
   frame.setAttribute('referrerpolicy', 'no-referrer');
   frame.title = 'Sandboxed JavaScript output';
-  const policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; form-action 'none'; base-uri 'none'";
+  const policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; form-action 'none'; navigate-to 'none'; base-uri 'none'";
   const scriptClose = '<' + '/script>';
   const slashEscape = String.fromCharCode(92);
   const safeCode = source.replace(new RegExp('<' + '/script', 'gi'), '<' + slashEscape + '/' + 'script');
