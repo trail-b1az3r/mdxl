@@ -33,6 +33,15 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertIn("[ ]", rendered)
         self.assertIn("\033[9moutdated", rendered)
 
+    def test_plus_headings_nested_quotes_and_striped_through(self):
+        source = "+# Compact detail\n++# Fine detail\n>> Nested quote\n~~~~striped text~~~~"
+        rendered = render_terminal(source)
+        self.assertIn("\033[1;35mCompact detail", rendered)
+        self.assertIn("\033[2;35mFine detail", rendered)
+        self.assertIn("│   │ Nested quote", rendered)
+        self.assertIn("\033[9;36m", rendered)
+        self.assertIn("\033[9;35m", rendered)
+
     def test_gfm_table_renders_as_aligned_terminal_grid(self):
         source = "| Feature | Status |\n| :--- | ---: |\n| Tables | ready |\n| ~~Old approach~~ | replaced |"
         rendered = render_terminal(source)
