@@ -2,9 +2,13 @@
 """MDXL browser preview with live reload and standalone HTML export."""
 import argparse
 import html
+import json
 import os
 import re
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -55,6 +59,286 @@ ul.task-list{list-style:none;padding-left:1.25rem}.task-list-item{list-style:non
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 """
+
+
+
+
+# //autoT//text//target language aliases. Translation uses the locally configured
+# LibreTranslate endpoint; only source text explicitly marked with autoT is sent.
+TRANSLATION_ALIASES = {
+    "en": ("en", "English"), "english": ("en", "English"),
+    "es": ("es", "Spanish"), "spanish": ("es", "Spanish"), "sp": ("es", "Spanish"),
+    "sps": ("es", "Spanish (Spain)"), "spm": ("es", "Spanish (Mexico)"), "spansh": ("es", "Spanish"),
+    "fr": ("fr", "French"), "french": ("fr", "French"),
+    "de": ("de", "German"), "german": ("de", "German"),
+    "it": ("it", "Italian"), "italian": ("it", "Italian"),
+    "pt": ("pt", "Portuguese"), "portuguese": ("pt", "Portuguese"),
+    "ru": ("ru", "Russian"), "russian": ("ru", "Russian"),
+    "zh": ("zh", "Mandarin Chinese"), "mandarin": ("zh", "Mandarin Chinese"), "chinese": ("zh", "Mandarin Chinese"),
+    "yue": ("yue", "Cantonese"), "cantonese": ("yue", "Cantonese"),
+    "pl": ("pl", "Polish"), "polish": ("pl", "Polish"),
+    "ja": ("ja", "Japanese"), "japanese": ("ja", "Japanese"),
+    "ko": ("ko", "Korean"), "korean": ("ko", "Korean"),
+    "ar": ("ar", "Arabic"), "arabic": ("ar", "Arabic"),
+    "hi": ("hi", "Hindi"), "hindi": ("hi", "Hindi"),
+    "nl": ("nl", "Dutch"), "dutch": ("nl", "Dutch"),
+    "auto": ("auto", "Random language: Russian, Mandarin, Cantonese, or Polish"),
+}
+JOKE_ALIASES = {
+    "joke1": "Pirate English", "pirate": "Pirate English",
+    "joke2": "Archaic English", "oldenglish": "Archaic English",
+    "joke3": "Early Modern English", "earlymodern": "Early Modern English",
+    "joke4": "Shakespearean English", "shakespeare": "Shakespearean English",
+    "joke5": "Corporate jargon", "corporate": "Corporate jargon",
+    "joke6": "Noir detective", "noir": "Noir detective",
+    "joke7": "Gen Z slang", "genz": "Gen Z slang",
+}
+AUTO_TRANSLATE_ALIASES = sorted((*TRANSLATION_ALIASES, *JOKE_ALIASES), key=len, reverse=True)
+AUTO_TRANSLATE_RE = re.compile(
+    r"//autoT//(.*?)//(" + "|".join(map(re.escape, AUTO_TRANSLATE_ALIASES)) + r")(?![A-Za-z0-9_-])",
+    re.IGNORECASE | re.DOTALL,
+)
+FORMAT_HEADER_RE = re.compile(
+    r"^>>>[ \t]*\[([A-Za-z][A-Za-z0-9_-]*)\]((?:\([^)\n]*\)){0,4})[ \t]*(.*)$"
+)
+FORMAT_LABELS = {
+    "apa": "APA", "apa7": "APA 7", "mla": "MLA", "mla9": "MLA 9",
+    "chicago": "Chicago", "ieee": "IEEE", "harvard": "Harvard",
+    "turabian": "Turabian", "ama": "AMA", "generic": "Formatted document",
+}
+TRANSLATE_LANGUAGES = {"en", "es", "fr", "de", "it", "pt", "ru", "zh", "yue", "pl", "ja", "ko", "ar", "hi", "nl"}
+DEFAULT_TRANSLATE_ENDPOINT = "https://translate.argosopentech.com/translate"
+MAX_TRANSLATION_CHARS = 4000
+
+
+def _replace_style_words(text, replacements):
+    keys = sorted(replacements, key=len, reverse=True)
+    pattern = re.compile(r"\b(" + "|".join(map(re.escape, keys)) + r")\b", re.IGNORECASE)
+
+    def replace(match):
+        replacement = replacements[match.group(0).lower()]
+        if match.group(0).isupper():
+            return replacement.upper()
+        if match.group(0).istitle():
+            return replacement.title()
+        return replacement
+
+    return pattern.sub(replace, text)
+
+
+def _render_joke_style(text, alias):
+    styles = {
+        "joke1": {
+            "hello":"ahoy", "hi":"ahoy", "friend":"matey", "friends":"mateys",
+            "you":"ye", "your":"yer", "are":"be", "is":"be", "the":"th'",
+            "and":"an'", "money":"booty", "yes":"aye", "no":"nay", "very":"mighty",
+            "my":"me", "old":"weathered", "good":"fine",
+        },
+        "pirate": {
+            "hello":"ahoy", "hi":"ahoy", "friend":"matey", "friends":"mateys",
+            "you":"ye", "your":"yer", "are":"be", "is":"be", "the":"th'",
+            "and":"an'", "money":"booty", "yes":"aye", "no":"nay", "very":"mighty",
+            "my":"me", "old":"weathered", "good":"fine",
+        },
+        "joke2": {
+            "you":"thou", "your":"thy", "yours":"thine", "are":"art", "is":"is",
+            "do":"dost", "does":"doth", "have":"hast", "has":"hath", "before":"ere",
+            "hello":"good morrow", "yes":"verily", "no":"nay", "please":"prithee",
+            "because":"forsooth", "my":"mine", "friend":"good fellow",
+        },
+        "oldenglish": {
+            "you":"thou", "your":"thy", "yours":"thine", "are":"art", "do":"dost",
+            "does":"doth", "have":"hast", "has":"hath", "before":"ere",
+            "hello":"good morrow", "yes":"verily", "no":"nay", "please":"prithee",
+            "because":"forsooth", "my":"mine", "friend":"good fellow",
+        },
+        "joke3": {
+            "hello":"good day", "hi":"good day", "you":"you", "very":"exceedingly",
+            "get":"obtain", "start":"commence", "end":"conclude", "help":"assist",
+            "use":"utilize", "about":"concerning", "buy":"purchase", "show":"display",
+            "ask":"inquire", "before":"prior to", "after":"subsequent to",
+        },
+        "earlymodern": {
+            "hello":"good day", "hi":"good day", "very":"exceedingly", "get":"obtain",
+            "start":"commence", "end":"conclude", "help":"assist", "use":"utilize",
+            "about":"concerning", "buy":"purchase", "show":"display", "ask":"inquire",
+            "before":"prior to", "after":"subsequent to",
+        },
+        "joke4": {
+            "hello":"good morrow", "hi":"hail", "you":"thou", "your":"thy", "are":"art",
+            "is":"doth stand", "yes":"aye", "no":"nay", "friend":"noble soul",
+            "very":"most wondrously", "because":"forsooth", "before":"ere",
+        },
+        "shakespeare": {
+            "hello":"good morrow", "hi":"hail", "you":"thou", "your":"thy", "are":"art",
+            "is":"doth stand", "yes":"aye", "no":"nay", "friend":"noble soul",
+            "very":"most wondrously", "because":"forsooth", "before":"ere",
+        },
+        "joke5": {
+            "use":"leverage", "help":"provide enablement for", "start":"align on",
+            "finish":"drive to completion", "problem":"opportunity", "idea":"strategic initiative",
+            "change":"pivot", "meeting":"sync", "plan":"roadmap", "ask":"action item",
+            "good":"high-impact", "important":"mission-critical",
+        },
+        "corporate": {
+            "use":"leverage", "help":"provide enablement for", "start":"align on",
+            "finish":"drive to completion", "problem":"opportunity", "idea":"strategic initiative",
+            "change":"pivot", "meeting":"sync", "plan":"roadmap", "ask":"action item",
+            "good":"high-impact", "important":"mission-critical",
+        },
+        "joke6": {
+            "hello":"listen, pal", "friend":"client", "problem":"case", "money":"dough",
+            "police":"the law", "look":"take a long, hard look", "night":"the mean streets",
+            "rain":"the city's tears", "good":"on the level", "bad":"dirty",
+        },
+        "noir": {
+            "hello":"listen, pal", "friend":"client", "problem":"case", "money":"dough",
+            "police":"the law", "look":"take a long, hard look", "night":"the mean streets",
+            "rain":"the city's tears", "good":"on the level", "bad":"dirty",
+        },
+        "joke7": {
+            "very":"low-key", "good":"fire", "great":"goated", "bad":"mid",
+            "friend":"bestie", "friends":"besties", "understand":"get it",
+            "amazing":"iconic", "really":"literally", "cool":"chill", "no":"nah",
+            "yes":"yeah", "problem":"drama",
+        },
+        "genz": {
+            "very":"low-key", "good":"fire", "great":"goated", "bad":"mid",
+            "friend":"bestie", "friends":"besties", "understand":"get it",
+            "amazing":"iconic", "really":"literally", "cool":"chill", "no":"nah",
+            "yes":"yeah", "problem":"drama",
+        },
+    }
+    transformed = _replace_style_words(text, styles.get(alias, {}))
+    prefixes = {
+        "joke1":"Arrr! ", "pirate":"Arrr! ", "joke2":"Verily, ", "oldenglish":"Verily, ",
+        "joke3":"In formal terms, ", "earlymodern":"In formal terms, ",
+        "joke4":"Hark! ", "shakespeare":"Hark! ", "joke5":"For strategic alignment: ",
+        "corporate":"For strategic alignment: ", "joke6":"It was a dark night. ",
+        "noir":"It was a dark night. ", "joke7":"No cap: ", "genz":"No cap: ",
+    }
+    return prefixes.get(alias, "") + transformed
+
+
+def _render_translation_directives(content, translation_blocks):
+    def replace(match):
+        source = match.group(1).strip()
+        alias = match.group(2).lower()
+        index = len(translation_blocks)
+        if alias in JOKE_ALIASES:
+            label = JOKE_ALIASES[alias]
+            result = _render_joke_style(source, alias)
+            block = (
+                '<div class="mdxl-joke-translation"><div class="mdxl-translation-label">'
+                + html.escape(label) + '</div><p>' + html.escape(result) + '</p></div>'
+            )
+        else:
+            code, label = TRANSLATION_ALIASES[alias]
+            variant = alias if alias in {"sps", "spm"} else ""
+            source_html = html.escape(source)
+            block = (
+                '<div class="mdxl-translation" data-target="' + html.escape(code, quote=True)
+                + '" data-label="' + html.escape(label, quote=True)
+                + '" data-variant="' + html.escape(variant, quote=True)
+                + '" data-auto="true"><div class="mdxl-translation-label">Auto-translate · '
+                + html.escape(label) + '</div><blockquote class="translation-source">'
+                + source_html + '</blockquote><button type="button" class="translate-action">Translate again</button>'
+                + '<div class="translation-output" role="status" aria-live="polite"></div></div>'
+            )
+        translation_blocks.append(block)
+        return "\n\nMDXLTRANSLATIONBLOCK" + str(index) + "TOKEN\n\n"
+
+    return AUTO_TRANSLATE_RE.sub(replace, content)
+
+
+def _render_formatted_document(format_name, header_text, body_source):
+    headers = re.findall(r"\(([^)\n]*)\)", header_text)[:4]
+    normalized = format_name.lower()
+    label = FORMAT_LABELS.get(normalized, format_name.upper())
+    # The custom document wrapper uses the regular Markdown engine for its body.
+    body_source = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1> > \2", body_source)
+    body_source = expand_gfm_alerts(body_source)
+    body_html = markdown.markdown(
+        body_source,
+        extensions=[
+            "extra", "sane_lists", "nl2br", "admonition",
+            "pymdownx.tasklist", "pymdownx.tilde", "pymdownx.magiclink",
+            "pymdownx.caret", "pymdownx.mark", "pymdownx.details",
+        ],
+        extension_configs={
+            "pymdownx.tasklist": {"clickable_checkbox": False},
+            "pymdownx.tilde": {"subscript": False, "delete": True, "smart_delete": True},
+            "pymdownx.magiclink": {"repo_url_shorthand": False, "social_url_shorthand": False},
+        },
+    ) if body_source.strip() else ""
+    header_html = "".join(
+        '<div class="mdxl-format-header mdxl-format-header-' + str(index + 1) + '">'
+        + html.escape(value.strip()) + '</div>'
+        for index, value in enumerate(headers) if value.strip()
+    )
+    safe_format = re.sub(r"[^a-z0-9_-]", "", normalized) or "custom"
+    return (
+        '<section class="mdxl-format mdxl-format-' + safe_format + '" data-format="' + safe_format + '">'
+        '<div class="mdxl-format-label">' + html.escape(label) + ' format</div>'
+        '<header class="mdxl-format-headers">' + header_html + '</header>'
+        '<div class="mdxl-format-body">' + body_html + '</div></section>'
+    )
+
+
+def _extract_formatted_documents(content, formatted_blocks):
+    lines = content.splitlines()
+    output = []
+    index = 0
+    while index < len(lines):
+        match = FORMAT_HEADER_RE.match(lines[index])
+        if not match:
+            output.append(lines[index])
+            index += 1
+            continue
+        format_name, header_text, first_body_line = match.groups()
+        body_lines = [first_body_line] if first_body_line.strip() else []
+        index += 1
+        while index < len(lines) and not FORMAT_HEADER_RE.match(lines[index]):
+            body_lines.append(lines[index])
+            index += 1
+        formatted_blocks.append(_render_formatted_document(format_name, header_text, "\n".join(body_lines).strip()))
+        output.append("\nMDXLFORMATBLOCK" + str(len(formatted_blocks) - 1) + "TOKEN\n")
+    return "\n".join(output)
+
+
+def _translate_with_provider(text, target):
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("No text was provided for translation.")
+    if len(text) > MAX_TRANSLATION_CHARS:
+        raise ValueError("Translation text is limited to 4,000 characters per block.")
+    if target not in TRANSLATE_LANGUAGES:
+        raise ValueError("Unsupported target language code.")
+    endpoint = os.environ.get("MDXL_TRANSLATE_ENDPOINT", DEFAULT_TRANSLATE_ENDPOINT).strip()
+    parsed = urllib.parse.urlsplit(endpoint)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("MDXL_TRANSLATE_ENDPOINT must be an absolute HTTP or HTTPS URL.")
+    payload = {"q": text, "source": "auto", "target": target, "format": "text"}
+    api_key = os.environ.get("MDXL_TRANSLATE_API_KEY", "").strip()
+    if api_key:
+        payload["api_key"] = api_key
+    request = urllib.request.Request(
+        endpoint,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            data = json.loads(response.read(1_000_000).decode("utf-8"))
+    except urllib.error.HTTPError as error:
+        raise RuntimeError("Translation service rejected the request (HTTP " + str(error.code) + ").") from error
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
+        raise RuntimeError("Could not reach the translation service. Check the endpoint and network connection.") from error
+    translated = data.get("translatedText") if isinstance(data, dict) else None
+    if not isinstance(translated, str) or not translated.strip():
+        raise RuntimeError("Translation service returned no translated text. The selected language may not be available.")
+    return translated
+
 
 
 def escape_source_html(content):
