@@ -31,7 +31,7 @@ class TerminalRendererTests(unittest.TestCase):
     def test_auto_translation_joke_styles_are_local(self):
         rendered = render_terminal("//autoT//Hello friend//joke1")
         self.assertIn("Pirate English", rendered)
-        self.assertIn("Arrr! Ahoy Matey", rendered)
+        self.assertIn("Arrr! Ahoy matey", rendered)
 
     def test_auto_translation_uses_the_provider_for_language_codes(self):
         class FakeResponse:
