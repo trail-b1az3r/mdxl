@@ -26,7 +26,7 @@
         <RegExpr attribute="TableDelimiter" String="^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$" column="0"/>
 
         <!-- Extended inline syntax. -->
-        <RegExpr attribute="HeadingAttributes" String="\{#[A-Za-z0-9_-]+(?:\s+\.?[A-Za-z0-9_-]+)*\}"/>
+        <RegExpr attribute="HeadingAttributes" String="\{(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?)(?:\s+(?:#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+|[A-Za-z_][A-Za-z0-9_-]*(?:=(?:&quot;[^&quot;]*&quot;|&apos;[^&apos;]*&apos;|[^\s}]+))?))*\}"/>
         <RegExpr attribute="Footnote" String="\[\^[^]]+\]"/>
         <RegExpr attribute="Inserted" String="\^\^[^^]+\^\^" minimal="true"/>
         <RegExpr attribute="Superscript" String="\^[^^]+\^" minimal="true"/>
