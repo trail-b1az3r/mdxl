@@ -65,6 +65,18 @@ MDXL
         self.assertIn("Warning", rendered)
         self.assertIn("Stop and check this first.", rendered)
 
+    def test_five_backtick_code_is_copyable_and_tokens_stay_literal(self):
+        source = "`````text\n/rbw//literal//rbw//\n`````"
+        rendered = render_mdxl(source)
+        self.assertIn('class="exec-block"', rendered)
+        self.assertIn("/rbw//literal//rbw//", rendered)
+        self.assertNotIn('class="mdxl-rainbow"', rendered)
+
+    def test_unsafe_heading_attributes_and_link_schemes_are_removed(self):
+        rendered = render_mdxl('## Heading {onclick="alert(1)"}\n\n[unsafe](javascript:alert(1))')
+        self.assertNotIn("onclick=", rendered.lower())
+        self.assertNotIn('href="javascript:', rendered.lower())
+
     def test_raw_html_is_escaped(self):
         rendered = render_mdxl("<script>alert(1)</script>")
         self.assertIn("&lt;script&gt;", rendered)
