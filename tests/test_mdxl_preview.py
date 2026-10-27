@@ -24,6 +24,47 @@ class BrowserRendererTests(unittest.TestCase):
         self.assertNotIn('class="mdxl-rainbow"', rendered)
         self.assertNotIn("runCode", rendered)
 
+    def test_gfm_tables_tasks_strikethrough_and_autolinks(self):
+        source = """| Feature | Support |
+| :--- | ---: |
+| Tables | yes |
+
+- [x] shipped
+- [ ] next
+
+~~outdated~~ and https://example.com and user@example.com"""
+        rendered = render_mdxl(source)
+        self.assertIn("<table>", rendered)
+        self.assertIn('type="checkbox"', rendered)
+        self.assertIn("checked", rendered)
+        self.assertIn("<del>outdated</del>", rendered)
+        self.assertIn('href="https://example.com"', rendered)
+        self.assertIn('href="mailto:user@example.com"', rendered)
+
+    def test_markdown_extra_footnotes_definitions_abbreviations_and_heading_ids(self):
+        source = """## Named heading {#named-heading}
+
+MDXL supports HTML[^note].
+
+*[HTML]: Hyper Text Markup Language
+
+MDXL
+: A Markdown extension.
+
+[^note]: A footnote definition."""
+        rendered = render_mdxl(source)
+        self.assertIn('id="named-heading"', rendered)
+        self.assertIn('<abbr title="Hyper Text Markup Language">HTML</abbr>', rendered)
+        self.assertIn("<dl>", rendered)
+        self.assertIn("A Markdown extension.", rendered)
+        self.assertIn("footnote", rendered.lower())
+
+    def test_github_alerts_render_as_tonal_admonitions(self):
+        rendered = render_mdxl("> [!WARNING]\n> Stop and check this first.")
+        self.assertIn('class="admonition warning"', rendered)
+        self.assertIn("Warning", rendered)
+        self.assertIn("Stop and check this first.", rendered)
+
     def test_raw_html_is_escaped(self):
         rendered = render_mdxl("<script>alert(1)</script>")
         self.assertIn("&lt;script&gt;", rendered)
