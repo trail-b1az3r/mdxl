@@ -165,7 +165,7 @@ MDXL's own highlight token //hl//text//hl// remains available too.
 | /red//Text/red// | Strikethrough-style redaction |
 | //key//Ctrl+C//key// | Keyboard keycap |
 | /bar//70// | Progress bar, clamped to 0–100 |
-| ||||[Hidden text]|||| | Invisible ink in the browser preview |
+| `||||[Hidden text]||||` | Invisible ink in the browser preview |
 | /!!!/Turn around/!!!/ | Upside-down Unicode approximation |
 | [[==>>]], [[<<==]], [[<=>>]] | Directional arrows; click to cycle in preview |
 | :check:, :rocket:, :warn:, :fire:, :star: | Supported shortcode replacements |
