@@ -36,7 +36,6 @@ A paragraph with **strong text**, *emphasis*, and inline code.
 [MDXL on GitHub](https://github.com/trail-b1az3r/mdxl)
 ```
 
-## GitHub Flavored Markdown
 
 ## Nested quote shorthand
 
@@ -47,6 +46,7 @@ Use `>>` at the start of a line to quote a quote. The browser expands it to a ne
 >> A quotation inside that quotation
 ```
 
+## GitHub Flavored Markdown
 
 ### Tables and column alignment
 
@@ -73,19 +73,19 @@ Task lists render as disabled checkboxes in the browser preview. They communicat
 The terminal renderer prints a green checked marker for completed tasks and an unchecked marker for incomplete tasks.
 
 ### Strikethrough
+
+Wrap text in double tildes:
+
+```markdown
+This was ~~replaced by a better approach~~.
+```
+
 ### Striped-through text
 
 Four consecutive tildes create the distinct MDXL striped-through effect, not ordinary GFM strikethrough. The browser draws a patterned strike band; Kate and the terminal highlight or approximate the syntax in their own rendering model.
 
 ```markdown
 ~~~~This text is striped-through~~~~
-```
-
-
-Wrap text in double tildes:
-
-```markdown
-This was ~~replaced by a better approach~~.
 ```
 
 ### Bare URL and email autolinks
