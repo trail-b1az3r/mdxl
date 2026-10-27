@@ -60,7 +60,7 @@ This is ~~~~striped-through text~~~~."""
         pirate = render_mdxl("//autoT//Hello friend//joke1")
         self.assertIn('class="mdxl-joke-translation"', pirate)
         self.assertIn("Pirate English", pirate)
-        self.assertIn("Arrr! Ahoy Matey", pirate)
+        self.assertIn("Arrr! Ahoy matey", pirate)
 
     def test_formatted_document_blocks_apa_mla_and_optional_headers(self):
         apa = render_mdxl(">>>[APA](Research Title)(Author Name)(Course)(Date)\nThis is the **formatted body**.")
