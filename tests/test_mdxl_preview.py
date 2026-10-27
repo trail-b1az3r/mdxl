@@ -1,3 +1,4 @@
+import html
 import unittest
 
 from mdxl_preview import render_mdxl
@@ -15,7 +16,7 @@ class BrowserRendererTests(unittest.TestCase):
         self.assertIn('class="mdxl-micro-1"', rendered)
         self.assertIn('class="mdxl-micro-2"', rendered)
         self.assertIn('class="mdxl-micro-3"', rendered)
-        self.assertIn("<h4>four</h4>", rendered)
+        self.assertIn('<h4 id="four">four', rendered)
 
     def test_fenced_source_is_not_transformed_or_executed(self):
         source = "```text\n/rbw//literal//rbw//\n```"
@@ -39,7 +40,7 @@ class BrowserRendererTests(unittest.TestCase):
         self.assertIn("checked", rendered)
         self.assertIn("<del>outdated</del>", rendered)
         self.assertIn('href="https://example.com"', rendered)
-        self.assertIn('href="mailto:user@example.com"', rendered)
+        self.assertIn('href="mailto:user@example.com"', html.unescape(rendered))
 
     def test_markdown_extra_footnotes_definitions_abbreviations_and_heading_ids(self):
         source = """## Named heading {#named-heading}
