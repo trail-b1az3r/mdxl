@@ -38,7 +38,7 @@ class TerminalRendererTests(unittest.TestCase):
         rendered = render_terminal(source)
         self.assertRegex(rendered, r"\+-{14}\+-{10}\+")
         self.assertIn("| Feature", rendered)
-        self.assertIn("| Status", rendered)
+        self.assertIn("Status |", rendered)
         self.assertNotIn("| :--- | ---: |", rendered)
         self.assertIn("\033[9mOld approach\033[0m", rendered)
 
