@@ -50,7 +50,7 @@ MDXL builds on [GitHub Flavored Markdown](https://github.github.com/gfm/) and [M
 | `+# Heading`, `++# Heading` | Two additional compact heading levels |
 | `>> Nested quote` | Quote inside another quotation |
 | `~~~~Striped-through~~~~` | Striped strike-band effect |
-| ` ```js ... ``` ` | Click-to-run JavaScript in a sandboxed preview |
+| `js` code fence | Click-to-run JavaScript in a sandboxed preview |
 | `//autoT//Hola//en` | Translate marked text into English |
 | `>>>[APA](Title)(Author)(Course)(Date)` | Format a document block with optional headers |
 | `#### Subheading` | Markdown level-four heading |
