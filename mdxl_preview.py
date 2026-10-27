@@ -43,7 +43,7 @@ PREVIEW_CSS = """
 <style>
 :root{color-scheme:dark;--bg:#10120f;--line:#2b312a;--text:#e9eee5;--muted:#a2ad9b;--lime:#c0f477;--blue:#79c7ff}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(70rem 35rem at 80% -20%,#283820 0%,transparent 55%),var(--bg);color:var(--text);font:16px/1.7 ui-sans-serif,system-ui,-apple-system,sans-serif}
-article{max-width:900px;margin:0 auto;padding:clamp(24px,5vw,64px)}h1,h2,h3,h4{line-height:1.2;letter-spacing:-.025em}h1{font-size:clamp(2.1rem,5vw,3.6rem)}h2{margin-top:2em}.mdxl-micro-1,.mdxl-micro-2,.mdxl-micro-3{margin:.7em 0}.mdxl-micro-1{font-size:.92em;color:var(--lime)}.mdxl-micro-2{font-size:.8em;color:var(--muted)}.mdxl-micro-3{font-size:.7em;color:var(--muted);font-weight:500}h4{font-size:1.2rem;color:var(--blue)}
+article{max-width:900px;margin:0 auto;padding:clamp(24px,5vw,64px)}h1,h2,h3,h4{line-height:1.2;letter-spacing:-.025em}h1{font-size:clamp(2.1rem,5vw,3.6rem)}h2{margin-top:2em}.mdxl-micro-1,.mdxl-micro-2,.mdxl-micro-3{margin:.7em 0}.mdxl-micro-1{font-size:.92em;color:var(--lime)}.mdxl-micro-2{font-size:.8em;color:var(--muted)}.mdxl-micro-3{font-size:.7em;color:var(--muted);font-weight:500}.mdxl-micro-plus-1{margin:.65em 0;font-size:.66em;letter-spacing:.09em;color:var(--blue);font-weight:750;text-transform:uppercase}.mdxl-micro-plus-2{margin:.55em 0;font-size:.56em;letter-spacing:.13em;color:#c9baff;font-weight:750;text-transform:uppercase}.mdxl-striped-through{position:relative;display:inline-block;text-decoration:line-through;text-decoration-color:var(--lime);text-decoration-thickness:.14em}.mdxl-striped-through::after{content:"";position:absolute;left:-.02em;right:-.02em;top:50%;height:.22em;transform:translateY(-50%);background:repeating-linear-gradient(135deg,#c0f477 0 2px,#20291a 2px 4px);pointer-events:none;mix-blend-mode:screen}h4{font-size:1.2rem;color:var(--blue)}
 a{color:var(--lime)}blockquote{border-left:3px solid var(--lime);padding-left:1rem;color:var(--muted)}hr{border:0;border-top:1px solid var(--line)}img{max-width:100%}
 pre,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}code{background:#242a22;padding:.12em .32em;border-radius:5px}pre{overflow:auto;padding:1rem 1.25rem;border:1px solid var(--line);border-radius:14px;background:#0b0d0b;color:#dcebd3}pre code{padding:0;background:none}
 table{border-collapse:collapse;width:100%;display:block;overflow:auto}th,td{border:1px solid var(--line);padding:.55rem .75rem;text-align:left}th{background:#20271c}tr:nth-child(even){background:#141812}
@@ -142,6 +142,12 @@ def render_mdxl(content, live=False):
     )
     # Escape raw HTML only after protecting fenced code, so code remains readable.
     content = escape_source_html(content)
+    # Four tildes create MDXL's striped-through effect; code fences are protected above.
+    content = re.sub(
+        r"(?<!~)~~~~([^\n]+?)~~~~(?!~)",
+        lambda match: '<span class="mdxl-striped-through">' + match.group(1) + "</span>",
+        content,
+    )
 
     def colored(match):
         return '<span class="mdxl-color" style="color:#' + match.group(2) + '">' + html.escape(match.group(1)) + "</span>"
@@ -186,9 +192,13 @@ def render_mdxl(content, live=False):
     }.items():
         content = content.replace(token, markup)
     content = re.sub(r":([a-z0-9_]+):", lambda match: EMOJI.get(match.group(0), match.group(0)), content)
+    # A leading double greater-than is a shorthand for a quote nested in a quote.
+    content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1> > \2", content)
     content = re.sub(r"^(-#)\s(.*)$", r'<h5 class="mdxl-micro-1">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(-##)\s(.*)$", r'<h5 class="mdxl-micro-2">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(-###)\s(.*)$", r'<h5 class="mdxl-micro-3">\2</h5>', content, flags=re.MULTILINE)
+    content = re.sub(r"^(\+\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-2">\2</h5>', content, flags=re.MULTILINE)
+    content = re.sub(r"^(\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-1">\2</h5>', content, flags=re.MULTILINE)
 
     content = expand_gfm_alerts(content)
     body = markdown.markdown(
