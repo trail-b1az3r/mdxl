@@ -37,7 +37,7 @@ class KateAndMimeTests(unittest.TestCase):
             if element.get("attribute")
         }
         expected = {
-            "MicroHeader1", "MicroHeader2", "MicroHeader3", "AlertMarker",
+            "MicroHeader1", "MicroHeader2", "MicroHeader3", "AlertMarker",            "PlusHeader1", "PlusHeader2", "DoubleBlockquote", "StripedThrough",
             "TaskList", "FootnoteDefinition", "Abbreviation", "Details",
             "DefinitionList", "TableDelimiter", "HeadingAttributes", "Footnote",
             "Inserted", "Superscript", "Mark", "Strikethrough", "AutoLink",
