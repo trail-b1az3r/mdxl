@@ -16,6 +16,14 @@ Five-backtick blocks become copyable code blocks. Source code is not executed. R
 
 The mdxl-cli command maps MDXL tokens to ANSI colors and Unicode. It renders GFM checklist markers and double-tilde strikethrough, formats aligned GFM tables as bordered terminal grids, and turns GFM alert blockquotes into color-labeled callouts. Footnotes, definitions, and links remain readable source text rather than becoming a fully typeset terminal document.
 
+## Executable code, translation, and formatted documents
+
+JavaScript code fences receive an explicit Run button. Execution is user-triggered and occurs in a sandboxed iframe with network access disabled; MDXL does not auto-run code when opening a document. Other languages are displayed and copied as source only. The CLI never executes code.
+
+`//autoT//...//target` marks text for source-language detection and translation to a target alias. The browser preview automatically submits only explicitly marked spans to its translation endpoint. The default is a community-hosted LibreTranslate endpoint; set `MDXL_TRANSLATE_ENDPOINT` and optionally `MDXL_TRANSLATE_API_KEY` before starting `mdxl-preview` to use a different or self-hosted service. Regional Spanish aliases use Spanish translation plus a best-effort vocabulary adjustment. Joke aliases are local word substitutions, not machine translations.
+
+`>>>[APA](Title)(Author)(Course)(Date)` starts a format-styled document block. Its body continues until the next `>>>[...]` format header or end-of-file. The built-in styles are visual templates rather than a full academic citation engine.
+
 ## Export and live preview
 
 mdxl-preview serves the file on 127.0.0.1 and refreshes when it changes. Export standalone HTML with:
