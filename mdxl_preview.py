@@ -795,13 +795,15 @@ function runJavaScript(block) {
   frame.title = 'Sandboxed JavaScript output';
   const policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; form-action 'none'; base-uri 'none'";
   const scriptClose = '<' + '/script>';
-  const safeCode = source.replace(new RegExp('<' + '/script', 'gi'), '<\\/' + 'script');
+  const slashEscape = String.fromCharCode(92);
+  const safeCode = source.replace(new RegExp('<' + '/script', 'gi'), '<' + slashEscape + '/' + 'script');
   const bootstrap = "const out=document.getElementById('output');const format=v=>{if(typeof v==='string')return v;try{return JSON.stringify(v)}catch(e){return String(v)}};console.log=(...a)=>{out.textContent+=a.map(format).join(' ')+'\\n'};console.error=(...a)=>{out.textContent+='Error: '+a.map(format).join(' ')+'\\n'};window.onerror=(m)=>{out.textContent+='Error: '+m+'\\n'};";
   frame.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="' + policy + '"><style>body{margin:0;padding:12px;background:#0b0d0b;color:#e9eee5;font:13px/1.6 ui-monospace,monospace}pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:#c0f477}</style></head><body><pre id="output"></pre><script>' + bootstrap + scriptClose + '<script>' + safeCode + '\n' + scriptClose + '</body></html>';
   output.appendChild(frame);
-  window.setTimeout(() => {
+  const executionTimeout = window.setTimeout(() => {
     if (frame.isConnected) frame.srcdoc = '<!doctype html><body style="color:#ffb86b;background:#0b0d0b;font:13px monospace;padding:12px">Execution stopped after 10 seconds.</body>';
   }, 10000);
+  frame.addEventListener('load', () => window.clearTimeout(executionTimeout), {once:true});
 }
 document.addEventListener('click', async (event) => {
   const arrow = event.target.closest('[data-arrow]');
