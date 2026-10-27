@@ -12,6 +12,8 @@
         <!-- MDXL micro-headings; keep their text in a heading context so inline
              Markdown and MDXL formatting can still be highlighted. -->
         <RegExpr attribute="MicroHeader3" context="MicroHeader3 Line" String="^-###\s+" column="0"/>
+        <RegExpr attribute="PlusHeader2" context="PlusHeader2 Line" String="^\+\+#\s+" column="0"/>
+        <RegExpr attribute="PlusHeader1" context="PlusHeader1 Line" String="^\+#\s+" column="0"/>
         <RegExpr attribute="MicroHeader2" context="MicroHeader2 Line" String="^-##\s+" column="0"/>
         <RegExpr attribute="MicroHeader1" context="MicroHeader1 Line" String="^-#\s+" column="0"/>
 
@@ -32,12 +34,13 @@
         <RegExpr attribute="Superscript" String="\^[^^]+\^" minimal="true"/>
         <RegExpr attribute="Mark" String="==[^=]+==" minimal="true"/>
         <RegExpr attribute="Strikethrough" String="~~[^~]+~~" minimal="true"/>
+        <RegExpr attribute="StripedThrough" String="~~~~[^~]+~~~~" minimal="true"/>
         <RegExpr attribute="AutoLink" String="(?:https?|ftp)://[^\s&lt;&gt;\x60]+"/>
         <RegExpr attribute="Emoji" String=":([A-Za-z0-9_+-]+):"/>
 
         <!-- MDXL-only text effects and symbols. -->
         <StringDetect attribute="Special" context="UpsideDown" String="/!!!/"/>
-        <StringDetect attribute="Blockquote" String="&gt;&gt;"/>
+        <StringDetect attribute="DoubleBlockquote" String="&gt;&gt;"/>
         <StringDetect attribute="Arrow" String="[[==&gt;&gt;]]"/>
         <StringDetect attribute="Arrow" String="[[&lt;&lt;==]]"/>
         <StringDetect attribute="Arrow" String="[[&lt;=&gt;&gt;]]"/>
@@ -61,6 +64,12 @@
         <IncludeRules context="Normal Text"/>
       </context>
       <context name="MicroHeader3 Line" attribute="MicroHeader3" lineEndContext="#pop">
+        <IncludeRules context="Normal Text"/>
+      </context>
+      <context name="PlusHeader1 Line" attribute="PlusHeader1" lineEndContext="#pop">
+        <IncludeRules context="Normal Text"/>
+      </context>
+      <context name="PlusHeader2 Line" attribute="PlusHeader2" lineEndContext="#pop">
         <IncludeRules context="Normal Text"/>
       </context>
 
@@ -92,6 +101,8 @@
       <itemData name="MicroHeader1" defStyleNum="dsFunction" bold="1" color="#e0a0ff"/>
       <itemData name="MicroHeader2" defStyleNum="dsFunction" bold="1" color="#8bd5ff"/>
       <itemData name="MicroHeader3" defStyleNum="dsFunction" bold="1" color="#9ee37d"/>
+      <itemData name="PlusHeader1" defStyleNum="dsFunction" bold="1" color="#88d1ff"/>
+      <itemData name="PlusHeader2" defStyleNum="dsFunction" bold="1" color="#c9baff"/>
       <itemData name="CodeBlockFence" defStyleNum="dsKeyword" bold="1" color="#d7a7ff"/>
       <itemData name="MDXL Code Block" defStyleNum="dsString" color="#c5b5a8"/>
       <itemData name="AlertMarker" defStyleNum="dsKeyword" color="#ffb86b" bold="1"/>
@@ -104,6 +115,7 @@
       <itemData name="HeadingAttributes" defStyleNum="dsAnnotation" color="#b8a2ff"/>
       <itemData name="Footnote" defStyleNum="dsDecVal" color="#b8a2ff"/>
       <itemData name="Strikethrough" defStyleNum="dsNormal" strikeOut="1" color="#969f8f"/>
+      <itemData name="StripedThrough" defStyleNum="dsNormal" strikeOut="1" underline="1" color="#f08ab5"/>
       <itemData name="Mark" defStyleNum="dsNormal" backgroundColor="#d7fb81" color="#17210e" bold="1"/>
       <itemData name="Superscript" defStyleNum="dsDecVal" color="#88d1ff"/>
       <itemData name="Inserted" defStyleNum="dsNormal" underline="1" color="#c0f477"/>
@@ -112,6 +124,7 @@
       <itemData name="Special" defStyleNum="dsKeyword" color="#e36209" bold="1"/>
       <itemData name="UpsideDown" defStyleNum="dsNormal" color="#d7c5ef"/>
       <itemData name="Blockquote" defStyleNum="dsComment" italic="1"/>
+      <itemData name="DoubleBlockquote" defStyleNum="dsComment" italic="1" color="#c9baff"/>
       <itemData name="Arrow" defStyleNum="dsDataType" bold="1" color="#007bff"/>
       <itemData name="InvisibleInk" defStyleNum="dsNormal" color="#333333" backgroundColor="#333333"/>
       <itemData name="ColorTag" defStyleNum="dsKeyword" color="#ff4040" bold="1"/>
@@ -129,12 +142,13 @@
 
     <completion>
       <item>-# </item><item>-## </item><item>-### </item>
+      <item>+# </item><item>++# </item>
       <item># Heading</item><item>## Heading</item><item>### Heading</item><item>#### Heading</item>
       <item>- [ ] </item><item>- [x] </item><item>1. [ ] </item>
       <item>[^note]: </item><item>*[HTML]: </item>
       <item>&gt; [!NOTE]</item><item>&gt; [!TIP]</item><item>&gt; [!IMPORTANT]</item><item>&gt; [!WARNING]</item><item>&gt; [!CAUTION]</item>
       <item>## Heading {#id}</item><item>??? note "Details"</item>
-      <item>==highlight==</item><item>~~strikethrough~~</item><item>^superscript^</item><item>^^inserted^^</item>
+      <item>==highlight==</item><item>~~strikethrough~~</item><item>~~~~striped-through~~~~</item><item>&gt; quoted text</item><item>&gt;&gt; nested quoted text</item><item>^superscript^</item><item>^^inserted^^</item>
       <item>| Header | Header |</item><item>| :--- | ---: |</item>
       <item>&#96;&#96;&#96;python</item><item>&#96;&#96;&#96;bash</item><item>&#96;&#96;&#96;&#96;&#96;python</item>
       <item>/!!!/</item><item>/col//</item><item>/col#</item><item>/col:#</item>
