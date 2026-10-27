@@ -47,6 +47,9 @@ MDXL builds on [GitHub Flavored Markdown](https://github.github.com/gfm/) and [M
 | Syntax | Effect |
 | --- | --- |
 | `-# Heading`, `-## Heading`, `-### Heading` | Three micro-header levels |
+| `+# Heading`, `++# Heading` | Two additional compact heading levels |
+| `>> Nested quote` | Quote inside another quotation |
+| `~~~~Striped-through~~~~` | Striped strike-band effect |
 | `#### Subheading` | Markdown level-four heading |
 | `/col//Signal /col#B7F77A//` | Hex true color |
 | `/rbw//Spectrum//rbw//` | Rainbow text |

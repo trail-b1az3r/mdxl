@@ -18,6 +18,22 @@ class BrowserRendererTests(unittest.TestCase):
         self.assertIn('class="mdxl-micro-3"', rendered)
         self.assertIn('<h4 id="four">four', rendered)
 
+    def test_plus_headings_nested_quotes_and_striped_through(self):
+        source = """+# Compact detail
+++# Fine detail
+
+> Main quote
+>> Nested quote
+
+This is ~~~~striped-through text~~~~."""
+        rendered = render_mdxl(source)
+        self.assertIn('class="mdxl-micro-plus-1"', rendered)
+        self.assertIn('class="mdxl-micro-plus-2"', rendered)
+        self.assertGreaterEqual(rendered.count("<blockquote>"), 2)
+        self.assertIn('class="mdxl-striped-through"', rendered)
+        self.assertIn("striped-through text", rendered)
+        self.assertIn("repeating-linear-gradient(135deg", rendered)
+
     def test_fenced_source_is_not_transformed_or_executed(self):
         source = "```text\n/rbw//literal//rbw//\n```"
         rendered = render_mdxl(source)

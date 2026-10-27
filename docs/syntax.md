@@ -10,9 +10,11 @@ MDXL combines its own expressive tokens with core Markdown, GitHub Flavored Mark
 | `-## Text` | MDXL micro-header, level 2 |
 | `-### Text` | MDXL micro-header, level 3 |
 | `#### Text` | Ordinary Markdown level-four heading |
+| `+# Text` | Additional compact MDXL heading level |
+| `++# Text` | Fine-detail MDXL heading level |
 | `## A titled section {#custom-id}` | Markdown heading with a stable custom ID |
 
-The three dash-prefixed headings are MDXL-specific. In particular, `####` remains an ordinary Markdown heading. Its four hashes are not consumed as a custom token.
+The three dash-prefixed headings and two plus-prefixed headings are MDXL-specific. In particular, `####` remains an ordinary Markdown heading. Its four hashes are not consumed as a custom token.
 
 ## Core Markdown
 
@@ -32,6 +34,16 @@ A paragraph with **strong text**, *emphasis*, and inline code.
 - Another bullet
 
 [MDXL on GitHub](https://github.com/trail-b1az3r/mdxl)
+```
+
+
+## Nested quote shorthand
+
+Use `>>` at the start of a line to quote a quote. The browser expands it to a nested Markdown blockquote, and the terminal shows two quote rails.
+
+```markdown
+> Original quotation
+>> A quotation inside that quotation
 ```
 
 ## GitHub Flavored Markdown
@@ -66,6 +78,14 @@ Wrap text in double tildes:
 
 ```markdown
 This was ~~replaced by a better approach~~.
+```
+
+### Striped-through text
+
+Four consecutive tildes create the distinct MDXL striped-through effect, not ordinary GFM strikethrough. The browser draws a patterned strike band; Kate and the terminal highlight or approximate the syntax in their own rendering model.
+
+```markdown
+~~~~This text is striped-through~~~~
 ```
 
 ### Bare URL and email autolinks
@@ -163,6 +183,7 @@ MDXL's own highlight token //hl//text//hl// remains available too.
 | /rbw//Text//rbw// | Rainbow text |
 | //hl//Text//hl// | Highlight |
 | /red//Text/red// | Strikethrough-style redaction |
+| `~~~~Text~~~~` | Striped-through effect |
 | //key//Ctrl+C//key// | Keyboard keycap |
 | /bar//70// | Progress bar, clamped to 0–100 |
 | `||||[Hidden text]||||` | Invisible ink in the browser preview |

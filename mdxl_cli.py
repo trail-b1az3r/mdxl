@@ -244,6 +244,12 @@ def render_terminal(content):
         lambda m: m.group(1) + (f"\033[92m[x]{RESET}" if m.group(2).strip() else "[ ]") + " ",
         content,
     )
+    # Four tildes use an alternating-color strikethrough as a terminal-safe striped approximation.
+    content = re.sub(
+        r"(?<!~)~~~~([^\n]+?)~~~~(?!~)",
+        lambda m: "".join(f"\033[9;{36 if i % 2 == 0 else 35}m{char}{RESET}" for i, char in enumerate(m.group(1))),
+        content,
+    )
     content = re.sub(
         r"(?<!~)~~(.+?)~~(?!~)",
         lambda m: f"\033[9m{m.group(1)}{RESET}",
@@ -254,6 +260,9 @@ def render_terminal(content):
     content = re.sub(r"^-##\s(.*)$", rf"\033[2;1m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^-#\s(.*)$", rf"\033[1;4m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^####\s(.*)$", rf"\033[1;96m\1{RESET}", content, flags=re.MULTILINE)
+    content = re.sub(r"^\+\+#\s(.*)$", rf"\033[2;35m\1{RESET}", content, flags=re.MULTILINE)
+    content = re.sub(r"^\+#\s(.*)$", rf"\033[1;35m\1{RESET}", content, flags=re.MULTILINE)
+    content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1│   │ \2", content)
     content = re.sub(r"^(#{1,6})\s(.*)$", rf"\033[1;97m\2{RESET}", content, flags=re.MULTILINE)
     content = _render_gfm_alerts(content)
     content = _render_gfm_tables(content)
