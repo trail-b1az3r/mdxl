@@ -570,7 +570,7 @@ def expand_gfm_alerts(content):
 def sanitize_rendered_html(fragment):
     """Allow Markdown output while stripping unsafe elements, attributes, and URL schemes."""
     allowed_tags = set(bleach.sanitizer.ALLOWED_TAGS) | {
-        "h1", "h2", "h3", "h4", "h5", "h6", "p", "div", "span", "section",
+        "h1", "h2", "h3", "h4", "h5", "h6", "header", "p", "div", "span", "section",
         "article", "blockquote", "hr", "br", "pre", "code", "del", "ins",
         "mark", "kbd", "sup", "sub", "ul", "ol", "li", "input", "table",
         "thead", "tbody", "tr", "th", "td", "dl", "dt", "dd", "abbr",
