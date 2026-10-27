@@ -1,7 +1,7 @@
 import html
 import unittest
 
-from mdxl_preview import render_mdxl
+from mdxl_preview import _translate_with_provider, render_mdxl
 
 
 class BrowserRendererTests(unittest.TestCase):
@@ -61,6 +61,12 @@ This is ~~~~striped-through text~~~~."""
         self.assertIn('class="mdxl-joke-translation"', pirate)
         self.assertIn("Pirate English", pirate)
         self.assertIn("Arrr! Ahoy matey", pirate)
+
+    def test_translation_rejects_invalid_target_codes(self):
+        with self.assertRaises(ValueError):
+            _translate_with_provider("Hello", ["en"])
+        with self.assertRaises(ValueError):
+            _translate_with_provider("Hello", "not-a-language")
 
     def test_formatted_document_blocks_apa_mla_and_optional_headers(self):
         apa = render_mdxl(">>>[APA](Research Title)(Author Name)(Course)(Date)\nThis is the **formatted body**.")
