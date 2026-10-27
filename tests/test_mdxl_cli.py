@@ -21,7 +21,7 @@ class TerminalRendererTests(unittest.TestCase):
         self.assertIn("0%", render_terminal("/bar//0//"))
 
     def test_five_backtick_code_keeps_markdown_tokens_literal(self):
-        source = "`````python\nprint('~~not strike~~ /rbw//not rainbow//rbw//')\n````"
+        source = "`````python\nprint('~~not strike~~ /rbw//not rainbow//rbw//')\n`````"
         rendered = render_terminal(source)
         self.assertIn("~~not strike~~", rendered)
         self.assertIn("/rbw//not rainbow//rbw//", rendered)
