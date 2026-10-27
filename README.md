@@ -27,7 +27,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer installs both commands under `~/.local/bin`, adds Kate syntax, and creates a private virtual environment for the preview dependency. It does not use administrator privileges or modify system Python packages. Restart Kate and open a new terminal after installation.
+The installer installs both commands under `~/.local/bin`, registers the `text/x-mdxl` MIME type for `*.mdxl`, installs Kate's Markdown Extended Logic syntax definition, and creates a private virtual environment for the preview dependency. It does not use administrator privileges or modify system Python packages. Restart Kate and reopen existing `.mdxl` files after installation.
 
 ## Use
 
