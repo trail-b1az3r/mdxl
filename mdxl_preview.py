@@ -312,7 +312,7 @@ def _translate_with_provider(text, target):
         raise ValueError("No text was provided for translation.")
     if len(text) > MAX_TRANSLATION_CHARS:
         raise ValueError("Translation text is limited to 4,000 characters per block.")
-    if target not in TRANSLATE_LANGUAGES:
+    if not isinstance(target, str) or target not in TRANSLATE_LANGUAGES:
         raise ValueError("Unsupported target language code.")
     endpoint = os.environ.get("MDXL_TRANSLATE_ENDPOINT", DEFAULT_TRANSLATE_ENDPOINT).strip()
     parsed = urllib.parse.urlsplit(endpoint)
