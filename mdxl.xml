@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="Markdown XL" version="1" kateversion="5.0" section="Markup" extensions="*.mdxl" mimetype="text/x-mdxl" author="AI + blazer" license="MIT">
+    <highlighting>
+        <contexts>
+            <context attribute="Normal Text" lineBeginContext="#stay" lineEndContext="#stay" name="Normal Text">
+                <!-- Micro Headers -->
+                <RegExpr attribute="Header" context="#stay" String="^(-#|-##|-###|####)\s.*$" column="0"/>
+                
+                <!-- Executable Code Blocks (5 backticks) -->
+                <RegExpr attribute="CodeBlock" context="CodeBlock" String="^`````.*$" beginRegion="Code"/>
+                
+                <!-- Upside Down Text -->
+                <StringDetect attribute="Special" context="UpsideDown" String="/!!!/"/>
+                
+                <!-- Quote a Quote -->
+                <StringDetect attribute="Blockquote" context="#stay" String=">>"/>
+                
+                <!-- Interactive Arrows -->
+                <StringDetect attribute="Arrow" context="#stay" String="[[==>>]]"/>
+                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;&lt;==]]"/>
+                <StringDetect attribute="Arrow" context="#stay" String="[[&lt;=&gt;&gt;]]"/>
+                
+                <!-- Invisible Ink -->
+                <RegExpr attribute="InvisibleInk" context="#stay" String="\|\|\|\|\[.*?\]\|\|\|\|"/>
+                
+                <!-- Colored Text -->
+                <StringDetect attribute="ColorStart" context="ColorText" String="/col//"/>
+            </context>
+            
+            <context attribute="CodeBlock" lineBeginContext="#stay" lineEndContext="#pop" name="CodeBlock">
+                <RegExpr attribute="CodeBlock" context="#pop" String="^``````*$" endRegion="Code"/>
+            </context>
+            
+            <context attribute="UpsideDown" lineBeginContext="#stay" lineEndContext="#stay" name="UpsideDown">
+                <StringDetect attribute="Special" context="#pop" String="/!!!/"/>
+            </context>
+            
+            <context attribute="ColorText" lineBeginContext="#stay" lineEndContext="#stay" name="ColorText">
+                <RegExpr attribute="ColorEnd" context="#pop" String="/col#[0-9a-fA-F]{6}//"/>
+            </context>
+        </contexts>
+        
+        <itemDatas>
+            <itemData name="Normal Text" defStyleNum="dsNormal"/>
+            <itemData name="Header" defStyleNum="dsFunction" bold="1"/>
+            <itemData name="CodeBlock" defStyleNum="dsString"/>
+            <itemData name="Special" defStyleNum="dsKeyword"/>
+            <itemData name="Blockquote" defStyleNum="dsComment" italic="1"/>
+            <itemData name="Arrow" defStyleNum="dsDataType" bold="1"/>
+            <itemData name="InvisibleInk" defStyleNum="dsFloat"/>
+            <itemData name="ColorStart" defStyleNum="dsKeyword"/>
+            <itemData name="ColorText" defStyleNum="dsNormal"/>
+            <itemData name="ColorEnd" defStyleNum="dsKeyword"/>
+        </itemDatas>
+    </highlighting>
+</language>
