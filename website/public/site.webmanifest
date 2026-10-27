@@ -1,0 +1,15 @@
+{
+  "name": "MDXL",
+  "short_name": "MDXL",
+  "description": "Markdown, with another dimension.",
+  "icons": [
+    {
+      "src": "/mdxl-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#171d14",
+  "background_color": "#10120f",
+  "display": "standalone"
+}
