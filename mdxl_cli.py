@@ -74,6 +74,18 @@ def render_terminal(content):
     content = content.replace("[[<<==]]", "\033[1;34m⬅\033[0m")
     content = content.replace("[[<=>>]]", "\033[1;34m⇄\033[0m")
     content = re.sub(r":([a-z0-9_]+):", lambda m: EMOJI.get(m.group(0), m.group(0)), content)
+    # Plain terminal equivalents for common GFM inline and checklist syntax.
+    content = re.sub(
+        r"(?m)^(\s*(?:[-+*]|\d+[.)])\s+)\[([ xX])\]\s+",
+        lambda m: m.group(1) + (f"\033[92m[x]{RESET}" if m.group(2).strip() else "[ ]") + " ",
+        content,
+    )
+    content = re.sub(
+        r"(?<!~)~~(.+?)~~(?!~)",
+        lambda m: f"\033[9m{m.group(1)}{RESET}",
+        content,
+        flags=re.DOTALL,
+    )
     content = re.sub(r"^-###\s(.*)$", rf"\033[2m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^-##\s(.*)$", rf"\033[2;1m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"^-#\s(.*)$", rf"\033[1;4m\1{RESET}", content, flags=re.MULTILINE)
