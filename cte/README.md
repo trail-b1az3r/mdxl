@@ -14,9 +14,11 @@ CTE is a native Linux desktop editor for Markdown and MDXL (Markdown Extended Lo
 
 ## Build and install on Arch Linux
 
-From a checkout of this branch:
+After CTE is merged into the repository's `main` branch, clone the repository and build from the `cte` directory:
 
 ```bash
+git clone https://github.com/trail-b1az3r/mdxl.git
+cd mdxl/cte
 makepkg -si
 ```
 
