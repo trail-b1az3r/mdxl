@@ -33,10 +33,11 @@ The installer installs both commands under `~/.local/bin`, registers the `text/x
 
 CTE (Concentrated Text Editor) is a native multi-page MDXL editor with Edit and Render modes, a picker for installed system fonts, tabbed documents, and a Material 3 Expressive-inspired interface. An Arch Linux PKGBUILD and desktop launcher are in [cte/](cte/).
 
-Build and install on Arch Linux from the repository checkout:
+After CTE is merged into `main`, build and install on Arch Linux:
 
 ```bash
-cd cte
+git clone https://github.com/trail-b1az3r/mdxl.git
+cd mdxl/cte
 makepkg -si
 ```
 
