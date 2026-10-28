@@ -1,0 +1,22 @@
+# Maintainer: MDXL contributors
+pkgname=cte-mdxl
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Concentrated Text Editor (CTE), a native multi-page MDXL editor"
+arch=('any')
+url="https://github.com/trail-b1az3r/mdxl"
+license=('MIT')
+depends=('python' 'python-pyside6' 'python-pyside6-webengine' 'python-markdown' 'python-pymdown-extensions' 'python-bleach')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/trail-b1az3r/mdxl/archive/refs/heads/feature/cte-linux-desktop-app.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "${srcdir}/mdxl-feature-cte-linux-desktop-app"
+  install -Dm755 cte/cte.py "${pkgdir}/usr/bin/cte"
+  install -Dm644 mdxl_preview.py "${pkgdir}/usr/lib/cte/mdxl_preview.py"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 cte/cte.desktop "${pkgdir}/usr/share/applications/cte.desktop"
+  install -Dm644 cte/cte.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/cte.svg"
+  install -Dm644 cte/README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  sed -i 's/from mdxl_preview import render_mdxl/from sys import path as _sys_path\n_sys_path.insert(0, \"\/usr\/lib\/cte\")\nfrom mdxl_preview import render_mdxl/' "${pkgdir}/usr/bin/cte"
+}
