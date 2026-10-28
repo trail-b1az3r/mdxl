@@ -1,0 +1,26 @@
+# Maintainer: MDXL contributors
+pkgname=cte-mdxl
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Concentrated Text Editor (CTE), a native multi-page MDXL editor"
+arch=('any')
+url="https://github.com/trail-b1az3r/mdxl"
+license=('MIT')
+depends=('python' 'pyside6' 'qt6-webengine' 'python-markdown' 'python-pymdown-extensions' 'python-bleach')
+makedepends=('git')
+source=("cte::git+https://github.com/trail-b1az3r/mdxl.git#branch=main")
+sha256sums=('SKIP')
+
+package() {
+  cd "${srcdir}/cte"
+  install -Dm755 cte/cte.py "${pkgdir}/usr/lib/cte/cte.py"
+  install -Dm644 mdxl_preview.py "${pkgdir}/usr/lib/cte/mdxl_preview.py"
+  install -Dm755 /dev/stdin "${pkgdir}/usr/bin/cte" <<'WRAPPER'
+#!/bin/sh
+exec /usr/bin/python /usr/lib/cte/cte.py "$@"
+WRAPPER
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 cte/cte.desktop "${pkgdir}/usr/share/applications/cte.desktop"
+  install -Dm644 cte/cte.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/cte.svg"
+  install -Dm644 cte/README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+}

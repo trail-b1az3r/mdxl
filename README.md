@@ -29,6 +29,20 @@ chmod +x install.sh
 
 The installer installs both commands under `~/.local/bin`, registers the `text/x-mdxl` MIME type for `*.mdxl`, installs Kate's Markdown Extended Logic syntax definition, and creates a private virtual environment for the preview dependency. It does not use administrator privileges or modify system Python packages. Restart Kate and reopen existing `.mdxl` files after installation.
 
+## CTE desktop app (Arch Linux)
+
+CTE (Concentrated Text Editor) is a native multi-page MDXL editor with Edit and Render modes, a picker for installed system fonts, tabbed documents, and a Material 3 Expressive-inspired interface. An Arch Linux PKGBUILD and desktop launcher are in [cte/](cte/).
+
+After CTE is merged into `main`, build and install on Arch Linux:
+
+```bash
+git clone https://github.com/trail-b1az3r/mdxl.git
+cd mdxl/cte
+makepkg -si
+```
+
+See [the CTE guide](cte/README.md) for details.
+
 ## Use
 
 ```bash
