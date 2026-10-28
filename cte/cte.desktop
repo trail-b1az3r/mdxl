@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Concentrated Text Editor
+GenericName=MDXL Text Editor
+Comment=Edit and render Markdown Extended Logic documents
+Exec=cte %F
+Icon=cte
+Terminal=false
+Categories=Utility;TextEditor;Development;
+MimeType=text/x-mdxl;text/markdown;
+StartupNotify=true
