@@ -54,7 +54,7 @@ This is ~~~~striped-through text~~~~."""
         rendered = render_mdxl("A simple paragraph.")
         # Python must emit a literal \\n escape inside the JavaScript source,
         # rather than inserting an actual newline into a single-quoted JS string.
-        self.assertIn(r"safeCode + '\\n' + scriptClose", rendered)
+        self.assertIn(r"safeCode + '\n' + scriptClose", rendered)
         self.assertNotIn("safeCode + '\n' + scriptClose", rendered)
         self.assertIn("background-repeat:no-repeat", rendered)
 
