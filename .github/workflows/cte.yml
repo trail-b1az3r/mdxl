@@ -1,0 +1,21 @@
+name: CTE Linux app checks
+on:
+  pull_request:
+    paths:
+      - 'cte/**'
+      - 'PKGBUILD'
+  push:
+    branches: [main]
+    paths:
+      - 'cte/**'
+      - 'PKGBUILD'
+jobs:
+  python-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m py_compile cte/cte.py mdxl_preview.py
+      - run: python -c "import xml.etree.ElementTree as ET; ET.parse('cte/cte.desktop') if False else None"
