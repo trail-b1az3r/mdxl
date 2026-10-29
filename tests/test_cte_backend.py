@@ -4,6 +4,8 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from PySide6.QtCore import QUrl
+from PySide6.QtQml import QQmlComponent, QQmlEngine
 from PySide6.QtWidgets import QApplication
 
 from cte.cte import CTEBackend
@@ -58,6 +60,11 @@ class CTEBackendTests(unittest.TestCase):
         self.assertIn("backend.fontFamily", qml)
         self.assertIn("onTextChanged", qml)
         self.assertIn("preview.loadHtml(backend.renderedHtml, backend.baseUrl)", qml)
+
+        engine = QQmlEngine()
+        component = QQmlComponent(engine, QUrl.fromLocalFile(str(qml_path)))
+        errors = "\\n".join(error.toString() for error in component.errors())
+        self.assertTrue(component.isReady(), errors)
 
 
 if __name__ == "__main__":
