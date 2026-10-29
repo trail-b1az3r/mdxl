@@ -5,14 +5,14 @@ on:
       - 'cte/**'
       - 'mdxl_preview.py'
       - 'requirements-preview.txt'
-      - 'tests/test_cte_backend.py'
+      - 'tests/cte_backend_checks.py'
   push:
     branches: [main]
     paths:
       - 'cte/**'
       - 'mdxl_preview.py'
       - 'requirements-preview.txt'
-      - 'tests/test_cte_backend.py'
+      - 'tests/cte_backend_checks.py'
 jobs:
   python-check:
     runs-on: ubuntu-latest
@@ -27,6 +27,6 @@ jobs:
       - name: Test QML-backed CTE document controller
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m unittest discover -s tests -p 'test_cte_backend.py'
+        run: python tests/cte_backend_checks.py
       - name: Check QML and desktop assets exist
         run: python -c "from pathlib import Path; assert Path('cte/main.qml').is_file(); assert Path('cte/cte.desktop').is_file(); assert Path('cte/cte.svg').is_file()"
