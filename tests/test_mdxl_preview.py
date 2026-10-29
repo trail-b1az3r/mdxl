@@ -50,6 +50,14 @@ This is ~~~~striped-through text~~~~."""
         self.assertIn("sandbox", rendered)
         self.assertIn("Execution stopped after 10 seconds.", rendered)
 
+    def test_generated_page_has_valid_script_newline_escape_and_nonrepeating_background(self):
+        rendered = render_mdxl("A simple paragraph.")
+        # Python must emit a literal \\n escape inside the JavaScript source,
+        # rather than inserting an actual newline into a single-quoted JS string.
+        self.assertIn(r"safeCode + '\n' + scriptClose", rendered)
+        self.assertNotIn("safeCode + '\n' + scriptClose", rendered)
+        self.assertIn("background-repeat:no-repeat", rendered)
+
     def test_auto_translation_directive_and_joke_styles(self):
         translated = render_mdxl("//autoT//Hola, mundo.//en")
         self.assertIn('class="mdxl-translation"', translated)
