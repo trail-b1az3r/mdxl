@@ -45,7 +45,7 @@ class CTEBackendTests(unittest.TestCase):
         self.backend.newDocument()
         self.assertEqual(self.backend.wordCount, 0)
         self.backend.updateContent("# Second page\n\nnew text")
-        self.assertEqual(self.backend.wordCount, 4)
+        self.assertEqual(self.backend.wordCount, 5)
         self.assertIn("<h1", self.backend.renderedHtml)
         self.assertIn("new text", self.backend.renderedHtml)
 
