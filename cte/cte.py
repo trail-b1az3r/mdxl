@@ -252,7 +252,7 @@ class CTEBackend(QObject):
     def get_base_url(self):
         return self._base_url
 
-    documents = Property("QVariant", get_documents, constant=True)
+    documents = Property(QObject, get_documents, constant=True)
     currentIndex = Property(int, get_current_index, notify=currentIndexChanged)
     currentContent = Property(str, get_current_content, notify=currentDocumentChanged)
     fontFamilies = Property("QStringList", get_font_families, constant=True)
