@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import (
-    QAbstractListModel, QModelIndex, Property, QUrl, Qt, Signal, Slot,
+    QAbstractListModel, QModelIndex, QObject, Property, QUrl, Qt, Signal, Slot,
 )
 from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
@@ -128,10 +128,8 @@ class DocumentsModel(QAbstractListModel):
         self.endRemoveRows()
 
 
-class CTEBackend:
+class CTEBackend(QObject):
     """Python QObject exposed to QML; owns file operations, counts, fonts and HTML."""
-
-    from PySide6.QtCore import QObject
 
     currentIndexChanged = Signal()
     currentDocumentChanged = Signal()
@@ -142,6 +140,7 @@ class CTEBackend:
     countsChanged = Signal()
 
     def __init__(self, app, initial_files=()):
+        super().__init__()
         self._app = app
         self._documents = DocumentsModel()
         self._current_index = -1
