@@ -138,8 +138,7 @@ ApplicationWindow {
                     Layout.preferredWidth: 235
                     Layout.preferredHeight: 42
                     model: backend.fontFamilies
-                    currentIndex: Math.max(0, indexOfValue(backend.fontFamily))
-                    textRole: ""
+                    currentIndex: Math.max(0, backend.fontFamilies.indexOf(backend.fontFamily))
                     font.family: backend.fontFamily
                     font.pixelSize: 13
                     onActivated: backend.setFontFamily(currentText)
