@@ -57,6 +57,18 @@ table{border-collapse:collapse;width:100%;display:block;overflow:auto}th,td{bord
 .upside-down{display:inline-block;unicode-bidi:plaintext}.arrow{border:0;background:transparent;color:var(--blue);font-size:1.2em;font-weight:700;cursor:pointer;padding:0 .15em;border-radius:5px}.arrow:hover{background:#24313b}.exec-block{margin:1.25rem 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0d0b}.exec-header{display:flex;justify-content:space-between;align-items:center;padding:.55rem .8rem;color:var(--muted);background:#1a2018;border-bottom:1px solid var(--line);font:600 .78rem ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}.copy-code{border:1px solid #45513d;background:#252f20;color:var(--lime);padding:.35rem .65rem;border-radius:7px;cursor:pointer;font:inherit;text-transform:none;letter-spacing:0}.exec-block pre{margin:0;border:0;border-radius:0}
 ul.task-list{list-style:none;padding-left:1.25rem}.task-list-item{list-style:none;margin-left:-1.25rem}.task-list-item input[type=checkbox]{margin:0 .55rem .15rem 0;accent-color:var(--lime);vertical-align:middle}del{text-decoration:line-through;text-decoration-thickness:2px;color:#a2ad9b}ins{color:var(--lime);text-decoration:underline;text-decoration-style:dotted}abbr[title]{text-decoration:underline dotted;cursor:help}dl{margin:1rem 0}dt{font-weight:750;color:#e5efd9;margin-top:.8rem}dd{margin:.25rem 0 .75rem 1.5rem;color:var(--muted)}.footnote-ref,.footnote-backref{color:var(--lime);font-size:.8em}.footnote{border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem;font-size:.9em;color:var(--muted)}.admonition{margin:1.2rem 0;border:1px solid #46553a;border-left:4px solid var(--lime);border-radius:5px 16px 16px 5px;padding:.85rem 1.1rem;background:#c0f4770b}.admonition>.admonition-title{font-weight:750;color:var(--lime);margin-bottom:.45rem}.admonition.tip{border-left-color:#88d1ff;background:#88d1ff0b}.admonition.tip>.admonition-title{color:#88d1ff}.admonition.important{border-left-color:#b8a2ff;background:#b8a2ff0b}.admonition.important>.admonition-title{color:#b8a2ff}.admonition.warning,.admonition.caution{border-left-color:#ffb86b;background:#ffb86b0b}.admonition.warning>.admonition-title,.admonition.caution>.admonition-title{color:#ffb86b}details{border:1px solid var(--line);border-radius:12px;padding:.75rem 1rem;margin:1rem 0;background:#181d16}details>summary{cursor:pointer;color:var(--lime);font-weight:700}details[open]>summary{margin-bottom:.6rem}mark{background:#d7fb81;color:#17210e;border-radius:4px;padding:0 .2em}sup,sub{line-height:0}
 .exec-actions{display:flex;gap:7px;align-items:center}.run-code{border:1px solid #536a42;border-radius:7px;background:#253421;color:var(--lime);padding:.35rem .65rem;cursor:pointer;font:inherit;text-transform:none;letter-spacing:0}.exec-output:empty{display:none}.exec-output{border-top:1px solid var(--line);padding:0;background:#090b09}.exec-output iframe{display:block;width:100%;min-height:90px;border:0;background:#0b0d0b;color:#e9eee5}.mdxl-translation,.mdxl-joke-translation{margin:1.1rem 0;padding:1rem 1.1rem;border:1px solid #394632;border-left:4px solid var(--blue);border-radius:5px 14px 14px 5px;background:#88d1ff08}.mdxl-translation-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--blue);margin-bottom:.55rem}.translation-source{margin:.25rem 0 .75rem;border-left-color:#4b6654;font-size:.92em}.translate-action{padding:.45rem .8rem;border:1px solid #4c6040;border-radius:999px;background:#20291b;color:var(--lime);cursor:pointer;font:inherit;font-size:.82rem}.translate-action:disabled{opacity:.55;cursor:wait}.translation-output{margin-top:.75rem;white-space:pre-wrap;overflow-wrap:anywhere}.translation-output:empty{display:none}.translation-output[data-error="true"]{color:#ffb86b}.mdxl-joke-translation{border-left-color:#c9baff;background:#c9baff08}.mdxl-joke-translation .mdxl-translation-label{color:#c9baff}.mdxl-format{margin:1.6rem 0;padding:clamp(1.4rem,4vw,3rem);border:1px solid #424a3c;border-radius:6px;background:#f6f3eb;color:#282a25;font-family:Georgia,"Times New Roman",serif;line-height:1.85;box-shadow:0 16px 40px #0002}.mdxl-format-label{font:800 .62rem/1.4 ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#5d6d4c;border-bottom:1px solid #dedbcf;padding-bottom:.6rem;margin-bottom:1.25rem}.mdxl-format-headers{margin-bottom:1.8rem}.mdxl-format-header{min-height:1.4em}.mdxl-format-header-1{font-weight:700}.mdxl-format-body p{margin:.7rem 0}.mdxl-format-body a{color:#354d70}.mdxl-format-apa .mdxl-format-headers{text-align:center}.mdxl-format-apa .mdxl-format-header-1{margin-bottom:.6rem}.mdxl-format-mla .mdxl-format-headers{text-align:left}.mdxl-format-mla .mdxl-format-header-1{font-weight:400}.mdxl-format-mla .mdxl-format-body h1,.mdxl-format-mla .mdxl-format-body h2{text-align:center;font-size:1.15em;font-weight:400}.mdxl-format-ieee .mdxl-format-header-1{color:#294e79}.mdxl-format-chicago .mdxl-format-header-1{text-align:center;margin-bottom:1rem}.mdxl-format-harvard .mdxl-format-header-1{font-style:italic}
+.mdxl-underline{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.18em}.mdxl-big{font-size:1.45em;font-weight:650;line-height:1.2}.mdxl-small{font-size:.78em;color:var(--muted)}
+.mdxl-badge{display:inline-block;padding:.08em .62em;border-radius:99px;background:#2c3528;color:var(--lime);font-size:.8em;font-weight:700;letter-spacing:.02em;vertical-align:.08em;border:1px solid #445238}
+.mdxl-gradient span{font-weight:750}.mdxl-glow{color:#f4ffe1;text-shadow:0 0 .35em #c0f477,0 0 .9em #79c7ff}.mdxl-wave span{display:inline-block;animation:mdxl-wave 1.6s ease-in-out infinite}
+.mdxl-wave span:nth-child(6n+2){animation-delay:.1s}.mdxl-wave span:nth-child(6n+3){animation-delay:.2s}.mdxl-wave span:nth-child(6n+4){animation-delay:.3s}.mdxl-wave span:nth-child(6n+5){animation-delay:.4s}.mdxl-wave span:nth-child(6n){animation-delay:.5s}
+@keyframes mdxl-wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-.22em)}}
+.mdxl-tip{border-bottom:1px dotted var(--blue);cursor:help}ruby rt{font-size:.55em;color:var(--muted)}.mdxl-center{text-align:center}
+.mdxl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1.4rem;margin:1.2rem 0}.mdxl-column>:first-child{margin-top:0}
+.mdxl-card{margin:1.2rem 0;padding:1rem 1.25rem;border:1px solid var(--line);border-radius:16px;background:#151a13}.mdxl-card-title{font-weight:750;font-size:1.05em;margin-bottom:.4rem;color:var(--lime)}.mdxl-card>:last-child{margin-bottom:0}
+.mdxl-timeline{list-style:none;margin:1.2rem 0;padding:0 0 0 1.2rem;border-left:2px solid #3b4934}.mdxl-timeline li{position:relative;margin:0 0 .9rem;padding-left:.6rem}.mdxl-timeline li::before{content:"";position:absolute;left:-1.62rem;top:.55em;width:.7rem;height:.7rem;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px var(--bg)}
+.mdxl-when{display:block;font-size:.82em;font-weight:700;color:var(--blue);letter-spacing:.02em}
+.mdxl-chat{display:flex;flex-direction:column;gap:.55rem;margin:1.2rem 0}.mdxl-msg{max-width:78%;padding:.5rem .85rem;border-radius:16px;background:#1d241a}.mdxl-msg p{margin:0}.mdxl-msg-left{align-self:flex-start;border-bottom-left-radius:5px}
+.mdxl-msg-right{align-self:flex-end;background:#2a3b22;border-bottom-right-radius:5px}.mdxl-who{display:block;font-size:.75em;font-weight:700;color:var(--muted)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 """
@@ -574,7 +586,7 @@ def sanitize_rendered_html(fragment):
         "article", "blockquote", "hr", "br", "pre", "code", "del", "ins",
         "mark", "kbd", "sup", "sub", "ul", "ol", "li", "input", "table",
         "thead", "tbody", "tr", "th", "td", "dl", "dt", "dd", "abbr",
-        "details", "summary", "label", "button",
+        "details", "summary", "label", "button", "ruby", "rt", "rp",
     }
     safe_names = {
         "class", "id", "title", "href", "src", "alt", "width", "height",
@@ -598,12 +610,141 @@ def sanitize_rendered_html(fragment):
     )
     return cleaner.clean(fragment)
 
+def _hex_rgb(value):
+    return tuple(int(value[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def _readable_on(hex_value):
+    """Black or white text, whichever reads better on this background."""
+    r, g, b = _hex_rgb(hex_value)
+    return "#10120f" if (0.2126 * r + 0.7152 * g + 0.0722 * b) > 140 else "#ffffff"
+
+
+def _text(value, quote=False):
+    """Escape text the new syntax puts into the page once, even where raw tags were already escaped (line by line
+    above, before the blocks and tokens run)."""
+    return html.escape(html.unescape(value), quote=quote)
+
+
+def _inline_markdown(text):
+    """Markdown for a fragment inside a generated block: emphasis, links and code, without a wrapping paragraph."""
+    rendered = markdown.markdown(text, extensions=["extra", "pymdownx.tilde", "pymdownx.mark", "pymdownx.caret"])
+    return re.sub(r"^<p>(.*)</p>$", r"\1", rendered.strip(), flags=re.DOTALL)
+
+
+# ::: blocks (columns, card, timeline, chat): the innermost first, so a card can sit in a column.
+MDXL_BLOCK_RE = re.compile(
+    r"(?ms)^:::[ \t]*(columns|card|timeline|chat)\b[ \t]*([^\n]*)\n"
+    r"((?:(?!^:::[ \t]*(?:columns|card|timeline|chat)\b).)*?)^:::[ \t]*$"
+)
+
+
+def _expand_mdxl_blocks(content, generated):
+    """Turn ::: blocks into HTML. Columns and cards keep Markdown inside (md_in_html); timelines and chats are made
+    whole here and held in `generated` until after Markdown, like the formatted documents."""
+    def hold(markup):
+        generated.append(markup)
+        return "\n\nMDXLGENERATEDBLOCK" + str(len(generated) - 1) + "TOKEN\n\n"
+
+    def convert(match):
+        kind, argument, body = match.group(1), match.group(2).strip(), match.group(3)
+        if kind == "columns":
+            columns = re.split(r"(?m)^:::\|[ \t]*$", body)
+            inner = "".join('<div class="mdxl-column" markdown="1">\n\n' + column.strip("\n") + "\n\n</div>\n"
+                            for column in columns)
+            return '\n<div class="mdxl-columns" markdown="1">\n' + inner + "</div>\n"
+        if kind == "card":
+            title = ('<div class="mdxl-card-title">' + _text(argument) + "</div>\n") if argument else ""
+            return '\n<div class="mdxl-card" markdown="1">\n' + title + "\n" + body.strip("\n") + "\n\n</div>\n"
+        if kind == "timeline":
+            items = []
+            for line in body.splitlines():
+                if not line.strip():
+                    continue
+                when, sep, what = line.partition("::")
+                if not sep:
+                    when, what = "", line
+                items.append('<li><span class="mdxl-when">' + _text(when.strip()) + "</span>"
+                             + _inline_markdown(what.strip()) + "</li>")
+            return hold('<ol class="mdxl-timeline">' + "".join(items) + "</ol>")
+        # chat: "Name: message"; the first speaker on the left, everyone else on the right.
+        messages, first = [], None
+        for line in body.splitlines():
+            if not line.strip():
+                continue
+            name, sep, text = line.partition(":")
+            if not sep or not name.strip() or len(name) > 40:
+                name, text = "", line
+            name = name.strip()
+            first = first if first is not None else name
+            side = "left" if name == first else "right"
+            who = ('<span class="mdxl-who">' + _text(name) + "</span>") if name else ""
+            messages.append('<div class="mdxl-msg mdxl-msg-' + side + '">' + who + "<p>"
+                            + _inline_markdown(text.strip()) + "</p></div>")
+        return hold('<div class="mdxl-chat">' + "".join(messages) + "</div>")
+
+    while True:
+        expanded = MDXL_BLOCK_RE.sub(convert, content)
+        if expanded == content:
+            return content
+        content = expanded
+
+
+def _expand_extended_inline(content):
+    """The extended inline tokens: underline, sizes, badges, gradients, wave, glow, tooltips, ruby, centred lines."""
+    content = re.sub(r"/u//(.*?)/u//", lambda m: '<span class="mdxl-underline">' + _text(m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/big//(.*?)/big//", lambda m: '<span class="mdxl-big">' + _text(m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/sml//(.*?)/sml//", lambda m: '<span class="mdxl-small">' + _text(m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+
+    def badge(match):
+        colour, text = match.group(1), _text(match.group(2))
+        if colour:
+            return ('<span class="mdxl-badge" style="background-color:#' + colour + ";color:" + _readable_on(colour)
+                    + '">' + text + "</span>")
+        return '<span class="mdxl-badge">' + text + "</span>"
+
+    content = re.sub(r"/bdg(?:#([0-9a-fA-F]{6}))?//(.*?)/bdg//", badge, content, flags=re.DOTALL)
+
+    def gradient(match):
+        start, end, text = _hex_rgb(match.group(1)), _hex_rgb(match.group(2)), match.group(3)
+        steps = max(len(text) - 1, 1)
+        chars = []
+        for index, char in enumerate(text):
+            t = index / steps
+            r, g, b = (round(a + (z - a) * t) for a, z in zip(start, end))
+            chars.append('<span style="color:#%02x%02x%02x">' % (r, g, b) + _text(char) + "</span>")
+        return '<span class="mdxl-gradient">' + "".join(chars) + "</span>"
+
+    content = re.sub(r"/grad#([0-9a-fA-F]{6})#([0-9a-fA-F]{6})//(.*?)/grad//", gradient, content, flags=re.DOTALL)
+    content = re.sub(r"/wave//(.*?)/wave//",
+                     lambda m: '<span class="mdxl-wave" aria-label="' + _text(m.group(1)) + '">'
+                     + "".join("<span>" + ("&nbsp;" if c == " " else _text(c)) + "</span>" for c in m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/glow//(.*?)/glow//", lambda m: '<span class="mdxl-glow">' + _text(m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/tip//(.*?)//(.*?)/tip//",
+                     lambda m: '<span class="mdxl-tip" title="' + _text(m.group(2), quote=True) + '" tabindex="0">'
+                     + _text(m.group(1)) + "</span>",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/rb//(.*?)//(.*?)/rb//",
+                     lambda m: "<ruby>" + _text(m.group(1)) + "<rp>(</rp><rt>" + _text(m.group(2))
+                     + "</rt><rp>)</rp></ruby>",
+                     content, flags=re.DOTALL)
+    # A whole line between -> and <- is centred; Markdown inside it still works (an attribute list on the paragraph).
+    content = re.sub(r"(?m)^[ \t]*->[ \t]*(.+?)[ \t]*<-[ \t]*$", r"\1\n{: .mdxl-center }", content)
+    return content
+
+
 def render_mdxl(content, live=False):
     """Render MDXL, GitHub Flavored Markdown, and Markdown Extra safely."""
     code_blocks = []
     exec_blocks = []
     translation_blocks = []
     formatted_blocks = []
+    generated_blocks = []
 
     def add_exec_block(lang, source):
         language = (lang or "text").strip() or "text"
@@ -687,6 +828,7 @@ def render_mdxl(content, live=False):
         return '<span class="upside-down">' + html.escape(text) + "</span>"
 
     content = re.sub(r"/!!!/(.*?)/!!!/", upside_down, content, flags=re.DOTALL)
+    content = _expand_extended_inline(content)
     for token, markup in {
         "[[==>>]]": '<button type="button" class="arrow" data-arrow="right" aria-label="Cycle arrow">➜</button>',
         "[[<<==]]": '<button type="button" class="arrow" data-arrow="left" aria-label="Cycle arrow">⬅</button>',
@@ -699,6 +841,8 @@ def render_mdxl(content, live=False):
     content = re.sub(r"^(-###)\s(.*)$", r'<h5 class="mdxl-micro-3">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(\+\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-2">\2</h5>', content, flags=re.MULTILINE)
     content = re.sub(r"^(\+#)\s(.*)$", r'<h5 class="mdxl-micro-plus-1">\2</h5>', content, flags=re.MULTILINE)
+    # ::: blocks after the inline tokens and shortcodes, so those work inside them too.
+    content = _expand_mdxl_blocks(content, generated_blocks)
     content = _extract_formatted_documents(content, formatted_blocks)
     # The formatted-document parser runs first so >>> headers are not mistaken for quotes.
     content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1> > \2", content)
@@ -736,9 +880,14 @@ def render_mdxl(content, live=False):
     for index, rendered in enumerate(formatted_blocks):
         marker = "MDXLFORMATBLOCK" + str(index) + "TOKEN"
         body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    for index, rendered in enumerate(generated_blocks):
+        marker = "MDXLGENERATEDBLOCK" + str(index) + "TOKEN"
+        body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
     for index, rendered in enumerate(translation_blocks):
         marker = "MDXLTRANSLATIONBLOCK" + str(index) + "TOKEN"
         body = body.replace("<p>" + marker + "</p>", rendered).replace(marker, rendered)
+    # A centred line is a paragraph with an attribute list after it; nl2br leaves a <br> before that line.
+    body = re.sub(r'(<p class="mdxl-center">.*?)<br\s*/?>\s*</p>', r"\1</p>", body, flags=re.DOTALL)
     body = sanitize_rendered_html(body)
 
     script = """

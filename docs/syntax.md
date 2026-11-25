@@ -245,6 +245,91 @@ The browser preview styles each format with a different paper-like layout. This 
 | [[==>>]], [[<<==]], [[<=>>]] | Directional arrows; click to cycle in preview |
 | :check:, :rocket:, :warn:, :fire:, :star: | Supported shortcode replacements |
 
+## Extended inline tokens
+
+Each pairs an opening marker with a matching closing one, like the tokens above. The text inside is shown as written.
+
+| Source | Effect |
+|---|---|
+| /u//Text/u// | Underline |
+| /big//Text/big// | Larger inline text |
+| /sml//Text/sml// | Smaller, quieter inline text |
+| /bdg//Text/bdg// | A badge (a small rounded label) |
+| /bdg#RRGGBB//Text/bdg// | A badge in that colour; its text is black or white, whichever reads better |
+| /grad#RRGGBB#RRGGBB//Text/grad// | Text fading from the first colour to the second, letter by letter |
+| /wave//Text/wave// | Letters that ripple (still for readers who ask for reduced motion) |
+| /glow//Text/glow// | Glowing text |
+| /tip//Text//Tooltip/tip// | Text with a tooltip shown on hover or keyboard focus |
+| /rb//Base//Reading/rb// | Ruby annotation: the reading above the base text (furigana, pinyin) |
+| `->A whole line<-` | The line centred; Markdown inside it still works |
+
+```md
+Version /bdg//2.0/bdg// is /big//here/big//: /grad#FF5F57#4DB6FF//a sunset of new syntax/grad//.
+/rb//東京//とうきょう/rb// is /tip//Tokyo//The capital of Japan/tip//.
+->**Centred** and /glow//glowing/glow//<-
+```
+
+The terminal renderer approximates them: underline and dim text, BIGGER in capitals, badges in reverse colour, the
+gradient in true colour, the tooltip and the reading in brackets after the text, and the centred line centred to the
+terminal's width.
+
+## Blocks
+
+A block starts with `:::` and its kind on a line of its own, and ends with a line that is just `:::`. Blocks can sit
+inside one another (a card in a column).
+
+### Columns
+
+Split the content with `:::|`. Columns share the width, and stack on a narrow screen. Markdown works inside them.
+
+```md
+::: columns
+### Before
+The old way.
+:::|
+### After
+The new way, with **less** typing.
+:::
+```
+
+### Cards
+
+The words after `card` are the title (optional).
+
+```md
+::: card Release notes
+Version 2.0 adds *columns*, cards, timelines and chats.
+:::
+```
+
+### Timelines
+
+One event a line: when, two colons, what. A line without `::` is an event without a date.
+
+```md
+::: timeline
+2024 :: The first **MDXL** renderer
+2025 :: Kate highlighting
+2026 :: Columns, cards, timelines and chats
+:::
+```
+
+### Chats
+
+One message a line: the speaker, a colon, the message. The first speaker's messages are on the left, everyone
+else's on the right.
+
+```md
+::: chat
+Ana: Did the build pass?
+Ben: Yes, *all green*.
+Ana: Ship it :rocket:
+:::
+```
+
+In the terminal a card is drawn in a frame, columns follow one another under a dotted rule, a timeline runs down a
+rail, and a chat lists each speaker with their message (replies indented).
+
 ## Code blocks and safety
 
 Standard three-backtick or tilde fences remain ordinary Markdown code blocks. Five backticks select MDXL's copyable-code presentation. Tokens inside fenced code are preserved and not reinterpreted.

@@ -78,6 +78,18 @@ MDXL builds on [GitHub Flavored Markdown](https://github.github.com/gfm/) and [M
 | `/!!!/Hello world/!!!/` | Upside-down text |
 | `[[==>>]]`, `[[<<==]]`, `[[<=>>]]` | Directional arrows |
 | `:check:`, `:rocket:` | Shortcodes |
+| `/u//Underlined/u//` | Underline |
+| `/big//Bigger/big//`, `/sml//Smaller/sml//` | Larger or smaller inline text |
+| `/bdg//Beta/bdg//`, `/bdg#2E8BF2//v2.0/bdg//` | Badge, optionally coloured |
+| `/grad#FF5F57#4DB6FF//Sunset/grad//` | Two-colour gradient text |
+| `/wave//Hello/wave//`, `/glow//Neon/glow//` | Wavy or glowing text |
+| `/tip//Word//Explanation/tip//` | Hover tooltip |
+| `/rb//漢字//かんじ/rb//` | Ruby annotation (furigana, pinyin) |
+| `->Centred line<-` | Centred line |
+| `::: columns` … `:::\|` … `:::` | Side-by-side columns |
+| `::: card Title` … `:::` | Titled card |
+| `::: timeline` with `2026 :: Event` lines | Timeline |
+| `::: chat` with `Name: message` lines | Chat bubbles |
 
 ## Docs and development
 

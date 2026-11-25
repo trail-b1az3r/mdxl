@@ -92,5 +92,32 @@ class TerminalRendererTests(unittest.TestCase):
             self.assertIn(symbol, rendered)
 
 
+    def test_extended_inline_tokens(self):
+        rendered = render_terminal("/u//u/u// /big//big/big// /bdg//Beta/bdg// /grad#FF0000#0000FF//ab/grad// "
+                                   "/tip//Word//Tip/tip// /rb//漢字//かんじ/rb//")
+        self.assertIn("\033[4mu\033[0m", rendered)
+        self.assertIn("BIG", rendered)
+        self.assertIn(" Beta ", rendered)
+        self.assertIn("38;2;255;0;0ma", rendered)
+        self.assertIn("(Tip)", rendered)
+        self.assertIn("漢字\033[2m(かんじ)", rendered)
+        self.assertNotIn("/bdg//", rendered)
+
+    def test_card_frame_lines_up(self):
+        import re
+        rendered = render_terminal("::: card Notes\nHello\n:::")
+        lines = [re.sub(r"\033\[[0-9;]*m", "", line) for line in rendered.splitlines() if line.strip()]
+        self.assertTrue(lines[0].startswith("╭─ Notes "))
+        self.assertTrue(lines[-1].startswith("╰"))
+        self.assertEqual(len(lines[0]), len(lines[-1]))
+
+    def test_timeline_and_chat(self):
+        rendered = render_terminal("::: timeline\n2024 :: Start\n:::\n\n::: chat\nAna: hi\nBen: yo\n:::")
+        self.assertIn("●", rendered)
+        self.assertIn("Start", rendered)
+        self.assertIn("Ana\033[0m ▸ hi", rendered)
+        self.assertIn("        \033[1;95mBen", rendered)
+        self.assertNotIn(":::", rendered)
+
 if __name__ == "__main__":
     unittest.main()

@@ -46,6 +46,95 @@ def _flip(match):
 
 
 ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+
+
+def _rgb(hex_value):
+    return tuple(int(hex_value[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def _gradient(match):
+    start, end, text = _rgb(match.group(1)), _rgb(match.group(2)), match.group(3)
+    steps = max(len(text) - 1, 1)
+    out = []
+    for index, char in enumerate(text):
+        t = index / steps
+        r, g, b = (round(a + (z - a) * t) for a, z in zip(start, end))
+        out.append(f"\033[1;38;2;{r};{g};{b}m{char}")
+    return "".join(out) + RESET
+
+
+def _badge(match):
+    colour, text = match.group(1), match.group(2)
+    if colour:
+        r, g, b = _rgb(colour)
+        fg = "30" if (0.2126 * r + 0.7152 * g + 0.0722 * b) > 140 else "97"
+        return f"\033[1;{fg};48;2;{r};{g};{b}m {text} {RESET}"
+    return f"\033[1;30;102m {text} {RESET}"
+
+
+def _terminal_width():
+    try:
+        return os.get_terminal_size().columns
+    except OSError:
+        return 80
+
+
+# ::: blocks (columns, card, timeline, chat), innermost first.
+MDXL_BLOCK_RE = re.compile(
+    r"(?ms)^:::[ \t]*(columns|card|timeline|chat)\b[ \t]*([^\n]*)\n"
+    r"((?:(?!^:::[ \t]*(?:columns|card|timeline|chat)\b).)*?)^:::[ \t]*$"
+)
+
+
+def _render_blocks(content):
+    """Terminal versions of the ::: blocks: a framed card, columns one after another under a rule, a timeline down a
+    rail, and a chat as speakers with arrows (the first speaker's lines on the left, the others indented)."""
+    def convert(match):
+        kind, argument, body = match.group(1), match.group(2).strip(), match.group(3).rstrip("\n")
+        if kind == "card":
+            lines = body.splitlines() or [""]
+            width = min(max([len(ANSI_ESCAPE_RE.sub("", l)) for l in lines] + [len(argument) + 2, 20]) + 2,
+                        _terminal_width() - 2)
+            out = ["\033[92m╭─" + (f" \033[1;92m{argument}\033[0;92m " if argument else "")
+                   + "─" * max(0, width - len(argument) - (3 if argument else 1)) + f"╮{RESET}"]
+            out += [f"\033[92m│{RESET} {line}" for line in lines]
+            out.append(f"\033[92m╰{'─' * width}╯{RESET}")
+            return "\n".join(out)
+        if kind == "columns":
+            columns = re.split(r"(?m)^:::\|[ \t]*$", body)
+            rule = f"\033[90m{'┄' * min(40, _terminal_width())}{RESET}"
+            return ("\n" + rule + "\n").join(column.strip("\n") for column in columns)
+        if kind == "timeline":
+            out = []
+            for line in body.splitlines():
+                if not line.strip():
+                    continue
+                when, sep, what = line.partition("::")
+                if not sep:
+                    when, what = "", line
+                out.append(f"\033[92m●{RESET} \033[1;96m{when.strip()}{RESET}  {what.strip()}")
+                out.append(f"\033[92m│{RESET}")
+            return "\n".join(out[:-1])
+        out, first = [], None
+        for line in body.splitlines():
+            if not line.strip():
+                continue
+            name, sep, text = line.partition(":")
+            if not sep or not name.strip() or len(name) > 40:
+                name, text = "", line
+            name = name.strip()
+            first = first if first is not None else name
+            if name == first:
+                out.append(f"\033[1;96m{name}{RESET} ▸ {text.strip()}")
+            else:
+                out.append(f"        \033[1;95m{name}{RESET} ▸ {text.strip()}")
+        return "\n".join(out)
+
+    while True:
+        expanded = MDXL_BLOCK_RE.sub(convert, content)
+        if expanded == content:
+            return content
+        content = expanded
 TABLE_SEPARATOR_RE = re.compile(r"^:?-{3,}:?$")
 ALERT_COLORS = {
     "NOTE": "\033[1;36m",
@@ -360,6 +449,19 @@ def render_terminal(content):
     content = re.sub(r"/bar//([0-9]{1,3})//", _bar, content)
     content = re.sub(r"/!!!/(.*?)/!!!/", _flip, content, flags=re.DOTALL)
     content = re.sub(r"\|\|\|\|\[(.*?)\]\|\|\|\|", lambda m: f"\033[30;40m{m.group(1)}{RESET}", content)
+    # The extended inline tokens, as near as a terminal gets.
+    content = re.sub(r"/u//(.*?)/u//", lambda m: f"\033[4m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"/big//(.*?)/big//", lambda m: f"\033[1m{m.group(1).upper()}{RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"/sml//(.*?)/sml//", lambda m: f"\033[2m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"/bdg(?:#([0-9a-fA-F]{6}))?//(.*?)/bdg//", _badge, content, flags=re.DOTALL)
+    content = re.sub(r"/grad#([0-9a-fA-F]{6})#([0-9a-fA-F]{6})//(.*?)/grad//", _gradient, content, flags=re.DOTALL)
+    content = re.sub(r"/wave//(.*?)/wave//", lambda m: f"\033[3;96m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"/glow//(.*?)/glow//", lambda m: f"\033[1;93m{m.group(1)}{RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"/tip//(.*?)//(.*?)/tip//", lambda m: f"\033[4m{m.group(1)}{RESET} \033[2m({m.group(2)}){RESET}",
+                     content, flags=re.DOTALL)
+    content = re.sub(r"/rb//(.*?)//(.*?)/rb//", lambda m: f"{m.group(1)}\033[2m({m.group(2)}){RESET}", content, flags=re.DOTALL)
+    content = re.sub(r"(?m)^[ \t]*->[ \t]*(.+?)[ \t]*<-[ \t]*$",
+                     lambda m: m.group(1).center(max(_terminal_width(), len(m.group(1)))).rstrip(), content)
     content = content.replace("[[==>>]]", "\033[1;34m➜\033[0m")
     content = content.replace("[[<<==]]", "\033[1;34m⬅\033[0m")
     content = content.replace("[[<=>>]]", "\033[1;34m⇄\033[0m")
@@ -391,6 +493,7 @@ def render_terminal(content):
     content = re.sub(r"^\+#\s(.*)$", rf"\033[1;35m\1{RESET}", content, flags=re.MULTILINE)
     content = re.sub(r"(?m)^([ \t]*)>>[ \t]?(.*)$", r"\1│   │ \2", content)
     content = re.sub(r"^(#{1,6})\s(.*)$", rf"\033[1;97m\2{RESET}", content, flags=re.MULTILINE)
+    content = _render_blocks(content)
     content = _render_gfm_alerts(content)
     content = _render_gfm_tables(content)
     for index, block in enumerate(mdxl_code_blocks):
@@ -403,7 +506,7 @@ def render_terminal(content):
 def main():
     parser = argparse.ArgumentParser(description="Render MDXL syntax in the terminal.")
     parser.add_argument("file", type=Path, help="Path to a .mdxl document")
-    parser.add_argument("--version", action="version", version="mdxl-cli 0.2.0")
+    parser.add_argument("--version", action="version", version="mdxl-cli 0.3.0")
     args = parser.parse_args()
     try:
         content = args.file.read_text(encoding="utf-8")

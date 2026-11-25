@@ -63,5 +63,17 @@ class KateAndMimeTests(unittest.TestCase):
         self.assertIn("Markdown Extended Logic document", installer)
 
 
+    def test_kate_highlights_and_completes_the_extended_syntax(self):
+        root = ET.parse(ROOT / "mdxl.xml").getroot()
+        used = {rule.get("attribute") for rule in root.iter() if rule.get("attribute")}
+        styles = {item.get("name") for item in root.findall(".//itemData")}
+        for name in ("Underline", "BigText", "SmallText", "Badge", "Gradient", "Wave", "Glow", "Tooltip", "Ruby",
+                     "CenterLine", "BlockFence", "TimelineWhen"):
+            self.assertIn(name, used)
+            self.assertIn(name, styles)
+        completions = (ROOT / "mdxl.xml").read_text(encoding="utf-8")
+        for item in ("/bdg//", "/grad#", "/rb//", "::: columns", "::: card Title", "::: timeline", "::: chat"):
+            self.assertIn(item, completions)
+
 if __name__ == "__main__":
     unittest.main()

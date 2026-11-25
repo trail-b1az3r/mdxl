@@ -59,4 +59,33 @@ Five-backtick code blocks are copyable, and code does not execute automatically:
 
 `````python
 print("The renderer displays code; it never executes it.")
-```
+`````
+
+## New in MDXL
+
+Text can be /u//underlined/u//, /big//bigger/big// or /sml//smaller/sml//, with a /bdg//beta/bdg// badge and a /bdg#2E8BF2//v2.0/bdg// one.
+A /grad#FF5F57#4DB6FF//gradient across these words/grad//, /wave//a wave/wave//, /glow//a glow/glow//, a /tip//tooltip//Hover me/tip// and /rb//漢字//かんじ/rb//.
+
+->A **centred** line<-
+
+::: columns
+### Before
+Plain Markdown, one block after another.
+:::|
+### After
+::: card Side by side
+Columns, cards, timelines and chats.
+:::
+:::
+
+::: timeline
+2024 :: The first **MDXL** renderer
+2025 :: Kate highlighting
+2026 :: Columns, cards, timelines and chats
+:::
+
+::: chat
+Ana: Did the build pass?
+Ben: Yes, *all green*.
+Ana: Ship it :rocket:
+:::

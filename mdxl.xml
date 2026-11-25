@@ -54,6 +54,21 @@
         <StringDetect attribute="KeyTag" context="KeyText" String="//key//"/>
         <RegExpr attribute="ProgressBar" String="/bar//[0-9]{1,3}//"/>
 
+        <!-- Extended MDXL: inline tokens and ::: blocks. -->
+        <RegExpr attribute="BlockFence" String="^:::[ \t]*(columns|card|timeline|chat)\b.*$" column="0"/>
+        <RegExpr attribute="BlockFence" String="^:::\|?[ \t]*$" column="0"/>
+        <RegExpr attribute="CenterLine" String="^[ \t]*-&gt;.+&lt;-[ \t]*$" column="0"/>
+        <RegExpr attribute="TimelineWhen" String="^[^:\n]{1,40}(?=\s::\s)" column="0"/>
+        <RegExpr attribute="Underline" String="/u//.*?/u//" minimal="true"/>
+        <RegExpr attribute="BigText" String="/big//.*?/big//" minimal="true"/>
+        <RegExpr attribute="SmallText" String="/sml//.*?/sml//" minimal="true"/>
+        <RegExpr attribute="Badge" String="/bdg(#[0-9a-fA-F]{6})?//.*?/bdg//" minimal="true"/>
+        <RegExpr attribute="Gradient" String="/grad#[0-9a-fA-F]{6}#[0-9a-fA-F]{6}//.*?/grad//" minimal="true"/>
+        <RegExpr attribute="Wave" String="/wave//.*?/wave//" minimal="true"/>
+        <RegExpr attribute="Glow" String="/glow//.*?/glow//" minimal="true"/>
+        <RegExpr attribute="Tooltip" String="/tip//.*?//.*?/tip//" minimal="true"/>
+        <RegExpr attribute="Ruby" String="/rb//.*?//.*?/rb//" minimal="true"/>
+
         <!-- Bundled Kate Markdown grammar: headings, lists, emphasis, links/images,
              tables, blockquotes, horizontal rules, code fences and code languages. -->
         <IncludeRules context="Normal Text##Markdown" includeAttrib="true"/>
@@ -142,6 +157,18 @@
       <itemData name="KeyTag" defStyleNum="dsKeyword" color="#d7d7d7"/>
       <itemData name="KeyText" defStyleNum="dsNormal" backgroundColor="#dddddd" color="#222222" bold="1"/>
       <itemData name="ProgressBar" defStyleNum="dsDataType" bold="1" color="#9ee37d"/>
+      <itemData name="BlockFence" defStyleNum="dsKeyword" bold="1" color="#c0f477"/>
+      <itemData name="CenterLine" defStyleNum="dsNormal" italic="1" color="#88d1ff"/>
+      <itemData name="TimelineWhen" defStyleNum="dsDataType" bold="1" color="#79c7ff"/>
+      <itemData name="Underline" defStyleNum="dsNormal" underline="1"/>
+      <itemData name="BigText" defStyleNum="dsNormal" bold="1" color="#f4ffe1"/>
+      <itemData name="SmallText" defStyleNum="dsComment" color="#a2ad9b"/>
+      <itemData name="Badge" defStyleNum="dsDataType" bold="1" backgroundColor="#2c3528" color="#c0f477"/>
+      <itemData name="Gradient" defStyleNum="dsNormal" bold="1" color="#c87a8b"/>
+      <itemData name="Wave" defStyleNum="dsNormal" italic="1" color="#79c7ff"/>
+      <itemData name="Glow" defStyleNum="dsNormal" bold="1" color="#f4ffe1" backgroundColor="#2f3d22"/>
+      <itemData name="Tooltip" defStyleNum="dsNormal" underline="1" color="#79c7ff"/>
+      <itemData name="Ruby" defStyleNum="dsNormal" color="#e0a0ff"/>
     </itemDatas>
 
     <completion>
@@ -162,6 +189,9 @@
       <item>[[==&gt;&gt;]]</item><item>[[&lt;&lt;==]]</item><item>[[&lt;=&gt;&gt;]]</item><item>&gt;&gt; </item>
       <item>//hl//</item><item>/red//</item><item>/rbw//</item><item>/bar//</item><item>//key//</item>
       <item>:fire:</item><item>:check:</item><item>:warn:</item>
+      <item>/u//</item><item>/big//</item><item>/sml//</item><item>/bdg//</item><item>/bdg#</item><item>/grad#</item>
+      <item>/wave//</item><item>/glow//</item><item>/tip//</item><item>/rb//</item><item>-&gt; centred &lt;-</item>
+      <item>::: columns</item><item>:::|</item><item>::: card Title</item><item>::: timeline</item><item>::: chat</item><item>:::</item>
     </completion>
   </highlighting>
 </language>

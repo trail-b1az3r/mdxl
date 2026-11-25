@@ -4,6 +4,11 @@ import unittest
 from mdxl_preview import _translate_with_provider, render_mdxl
 
 
+def _body(source):
+    """The rendered document without the page's own styles and scripts."""
+    return render_mdxl(source).split("<article>", 1)[1].rsplit("</article>", 1)[0]
+
+
 class BrowserRendererTests(unittest.TestCase):
     def test_restored_text_effects_render(self):
         rendered = render_mdxl("/col//lime /col#B7F77A// /rbw//rainbow//rbw// //hl//important//hl// /red//old/red// //key//Ctrl+C//key// /bar//70//")
@@ -148,6 +153,62 @@ MDXL
         self.assertIn("&lt;script&gt;", rendered)
         self.assertNotIn("<script>alert(1)</script>", rendered)
 
+
+    def test_extended_inline_tokens(self):
+        rendered = _body(
+            "/u//under/u// /big//big/big// /sml//small/sml// /bdg//Beta/bdg// /bdg#2E8BF2//v2/bdg// "
+            "/grad#FF0000#0000FF//ab/grad// /wave//hi/wave// /glow//neon/glow// /tip//Word//Explained/tip//"
+        )
+        for token in ('class="mdxl-underline"', 'class="mdxl-big"', 'class="mdxl-small"', 'class="mdxl-badge"',
+                      'class="mdxl-gradient"', 'class="mdxl-wave"', 'class="mdxl-glow"', 'class="mdxl-tip"'):
+            self.assertIn(token, rendered)
+        self.assertIn("background-color:#2E8BF2", rendered)
+        self.assertIn("color:#ff0000", rendered)   # the gradient starts on the first colour
+        self.assertIn("color:#0000ff", rendered)   # and ends on the second
+        self.assertIn('title="Explained"', rendered)
+        self.assertNotIn("/u//", rendered)
+
+    def test_ruby_survives_the_sanitizer(self):
+        rendered = _body("/rb//漢字//かんじ/rb//")
+        self.assertIn("<ruby>漢字", rendered)
+        self.assertIn("<rt>かんじ</rt>", rendered)
+
+    def test_centred_line(self):
+        rendered = _body("->A **centred** line<-")
+        self.assertIn('class="mdxl-center"', rendered)
+        self.assertIn("<strong>centred</strong>", rendered)
+        self.assertNotIn("<br", rendered.split('class="mdxl-center"', 1)[1].split("</p>", 1)[0])
+
+    def test_columns_hold_a_nested_card(self):
+        rendered = _body("::: columns\n### Before\nOld\n:::|\n::: card Side\n**New**\n:::\n:::")
+        self.assertIn('class="mdxl-columns"', rendered)
+        self.assertEqual(rendered.count('class="mdxl-column"'), 2)
+        self.assertIn('class="mdxl-card"', rendered)
+        self.assertIn("Side", rendered)
+        self.assertIn("<strong>New</strong>", rendered)
+        self.assertNotIn(":::", rendered)
+
+    def test_timeline_and_chat(self):
+        rendered = _body("::: timeline\n2024 :: The **first**\n2025 :: Next\n:::\n\n"
+                               "::: chat\nAna: Hi\nBen: Hello *there*\nAna: Bye\n:::")
+        self.assertIn('class="mdxl-timeline"', rendered)
+        self.assertIn('class="mdxl-when">2024', rendered)
+        self.assertIn("<strong>first</strong>", rendered)
+        self.assertEqual(rendered.count("mdxl-msg-left"), 2)
+        self.assertEqual(rendered.count("mdxl-msg-right"), 1)
+        self.assertIn("<em>there</em>", rendered)
+
+    def test_new_syntax_stays_literal_in_code(self):
+        rendered = _body("```\n/u//x/u//\n::: card T\nbody\n:::\n```")
+        self.assertIn("/u//x/u//", rendered)
+        self.assertIn("::: card T", rendered)
+        self.assertNotIn('class="mdxl-card"', rendered)
+
+    def test_block_text_is_escaped(self):
+        rendered = _body("::: chat\n<script>x</script>: <img src=x onerror=alert(1)>\n:::")
+        self.assertNotIn("<script>", rendered)
+        self.assertNotIn("<img", rendered)
+        self.assertIn('class="mdxl-who">&lt;script&gt;x&lt;/script&gt;</span>', rendered)   # escaped once
 
 if __name__ == "__main__":
     unittest.main()
